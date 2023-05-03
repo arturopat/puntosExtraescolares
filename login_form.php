@@ -4,6 +4,14 @@
 
 session_start();
 
+if (isset($_SESSION['nombre_usuario'])) {
+   header('location:user_page.php');
+}
+
+if (isset($_SESSION['admin_name'])) {
+   header('location:admin_page.php');
+}
+
 if (isset($_POST['submit'])) {
 
    $name = mysqli_real_escape_string($conn, $_POST['name']);
@@ -23,10 +31,16 @@ if (isset($_POST['submit'])) {
       if ($row['tipo_usuario'] == 'admin') {
 
          $_SESSION['admin_name'] = $row['nombre'];
+
+         $_SESSION['id_admin'] = $row['id'];
+
          header('location:admin_page.php');
       } elseif ($row['tipo_usuario'] == 'user') {
 
          $_SESSION['nombre_usuario'] = $row['nombre'];
+
+         $_SESSION['id_usuario'] = $row['id'];
+
          header('location:user_page.php');
       }
    } else {
@@ -89,7 +103,7 @@ if (isset($_POST['submit'])) {
                      <div class="d-flex justify-content-center py-4">
                         <a href="index.html" class="logo d-flex align-items-center w-auto">
                            <img src="assets/img/logo.png" alt="">
-                           <span class="d-none d-lg-block">NiceAdmin</span>
+                           <span class="d-none d-lg-block">Puntos Extraescolares</span>
                         </a>
                      </div><!-- End Logo -->
 
