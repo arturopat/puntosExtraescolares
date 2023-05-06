@@ -63,7 +63,7 @@ if (!isset($_SESSION['admin_name'])) {
    $id_admin = $_SESSION['id_admin'];
 
    // Consulta SQL para obtener los datos del usuario
-   $sql = "SELECT id, nombre, correo, tipo_usuario FROM usuarios WHERE id = ?";
+   $sql = "SELECT id, nombre, correo, tipo_usuario FROM adminsresponsables WHERE id = ?";
 
    // Preparar la consulta
    $stmt = $conn->prepare($sql);

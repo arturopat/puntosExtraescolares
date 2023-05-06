@@ -1,15 +1,15 @@
-4<?php
+<?php
 
-    @include '../config.php';
+@include '../config.php';
 
-    session_start();
+session_start();
 
-    if (!isset($_SESSION['admin_name'])) {
-        header('location: ../login_form.php');
-    }
+if (!isset($_SESSION['admin_name'])) {
+    header('location:../login_form.php');
+}
 
 
-    ?>
+?>
 
 
 
@@ -92,12 +92,10 @@
     $stmt->close();
 
     // Cerrar conexión
-
+    $conn->close();
     ?>
-
-
     <!-- ======= Header ======= -->
-    <header id="header" class="header fixed-top d-flex align-items-center ">
+    <header id="header" class="header fixed-top d-flex align-items-center">
 
         <div class="d-flex align-items-center justify-content-between">
             <a href="index.html" class="logo d-flex align-items-center">
@@ -144,6 +142,12 @@
                             <hr class="dropdown-divider">
                         </li>
 
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center" href="../login_form.php">
+                                <i class="bi bi-gear"></i>
+                                <span>Account Settings</span>
+                            </a>
+                        </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -194,124 +198,120 @@
     <main id="main" class="main">
 
         <div class="pagetitle">
-            <h1>Dashboard</h1>
+            <h1>Agregar Actividad</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="login_form.php">Home</a></li>
-                    <li class="breadcrumb-item active">Dashboard</li>
+                    <li class="breadcrumb-item active">Agregar Actividad</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
 
-
-
-
-        <div class="row">
-            <div class="col-lg-12">
-
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Datatables</h5>
-                        <a href="agregar_actividad.php" class="btn btn-primary">Agregar</a>
-                        <br>
-                        <br>
-
-                        <!-- Table with stripped rows -->
-                        <div class="datatable-wrapper datatable-loading no-footer sortable searchable fixed-columns">
-                            <div class="datatable-container">
-                                <table class="table datatable datatable-table">
-                                    <thead>
-                                        <tr>
-                                            <th data-sortable="true"><a href="#">ID</a></th>
-                                            <th data-sortable="true"><a href="#">Nombre</a></th>
-                                            <th data-sortable="true"><a href="#">Fecha Inicio</a></th>
-                                            <th data-sortable="true"><a href="#">Fecha Finalizacion</a></th>
-                                            <th data-sortable="true"><a href="#">Horario</a></th>
-                                            <th data-sortable="true"><a href="#">Puntos</a></th>
-                                            <th data-sortable="true"><a href="#">Cupo</a></th>
-                                            <th data-sortable="true"><a href="#">Responsable</a></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
-
-                                        $sql = "SELECT * FROM actividades";
-                                        $resultado = mysqli_query($conn, $sql);
-                                        if (!$resultado) {
-                                            die("Error al obtener los datos: " . mysqli_error($conn));
-                                        }
-
-                                        foreach ($resultado as $fila) {
-                                            echo "<tr>";
-                                            echo "<td>" . $fila['id_actividad'] . "</td>";
-                                            echo "<td>" . $fila['nombre_actividad'] . "</td>";
-                                            echo "<td>" . $fila['fecha_inicio'] . "</td>";
-                                            echo "<td>" . $fila['fecha_finalizacion'] . "</td>";
-                                            echo "<td>" . $fila['horario'] . "</td>";
-                                            echo "<td>" . $fila['puntos'] . "</td>";
-                                            echo "<td>" . $fila['cupo_disponible'] . "</td>";
-                                            echo "<td>" . $fila['id_responsable'] . "</td>";
-                                            echo "</tr>";
-                                        }
-
-                                        ?>
-
-
-
-
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="datatable-bottom">
-                                <div class="datatable-info">Showing 1 to 5 of 5 entries</div>
-                                <nav class="datatable-pagination">
-                                    <ul class="datatable-pagination-list"></ul>
-                                </nav>
-                            </div>
-                        </div>
-                        <!-- End Table with stripped rows -->
-
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
         <section class="section dashboard">
 
 
-        </section>
+            <div class="row">
+                <div class="col-lg-8">
 
-    </main><!-- End #main -->
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">General Form Elements</h5>
 
-    <!-- ======= Footer ======= -->
-    <footer id="footer" class="footer">
-        <div class="copyright">
-            &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
-        </div>
-        <div class="credits">
-            <!-- All the links in the footer should remain intact. -->
-            <!-- You can delete the links only if you purchased the pro version. -->
-            <!-- Licensing information: https://bootstrapmade.com/license/ -->
-            <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-        </div>
-    </footer><!-- End Footer -->
+                            <!-- General Form Elements -->
+                            <form>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Actividad</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputEmail" class="col-sm-2 col-form-label">Fecha Inicio</label>
+                                    <div class="col-sm-10">
+                                        <input type="date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputEmail" class="col-sm-2 col-form-label">Fecha Finalizacion</label>
+                                    <div class="col-sm-10">
+                                        <input type="date" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Horario</label>
+                                    <div class="col-sm-10">
+                                        <input type="time" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Puntos</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Cupo</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control">
+                                    </div>
+                                </div>
 
-    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-    <!-- Vendor JS Files -->
-    <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
-    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/vendor/chart.js/chart.umd.js"></script>
-    <script src="../assets/vendor/echarts/echarts.min.js"></script>
-    <script src="../assets/vendor/quill/quill.min.js"></script>
-    <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
-    <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
-    <script src="../assets/vendor/php-email-form/validate.js"></script>
+                                <div class="row mb-3">
+                                    <label class="col-sm-2 col-form-label">ID Responsable</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-select" aria-label="Default select example">
+                                            <option selected>Open this select menu</option>
+                                            <option value="1">One</option>
+                                            <option value="2">Two</option>
+                                            <option value="3">Three</option>
+                                        </select>
+                                    </div>
+                                </div>
 
-    <!-- Template Main JS File -->
-    <script src="../assets/js/main.js"></script>
+                                <div class="row mb-3">
+                                    <div class="col-sm-10">
+                                        <button type="submit" class="btn btn-primary">Submit Form</button>
+                                    </div>
+                                </div>
+
+                            </form><!-- End General Form Elements -->
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ======= Footer ======= -->
+            <footer id="footer" class="footer">
+                <div class="copyright">
+                    &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+                </div>
+                <div class="credits">
+                    <!-- All the links in the footer should remain intact. -->
+                    <!-- You can delete the links only if you purchased the pro version. -->
+                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
+                    <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
+                    Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+                </div>
+            </footer><!-- End Footer -->
+
+            <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+            <!-- Vendor JS Files -->
+            <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
+            <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+            <script src="../assets/vendor/chart.js/chart.umd.js"></script>
+            <script src="../assets/vendor/echarts/echarts.min.js"></script>
+            <script src="../assets/vendor/quill/quill.min.js"></script>
+            <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
+            <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
+            <script src="../assets/vendor/php-email-form/validate.js"></script>
+
+            <!-- Template Main JS File -->
+            <script src="../assets/js/main.js"></script>
 
 </body>
 

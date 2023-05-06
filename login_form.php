@@ -14,13 +14,11 @@ if (isset($_SESSION['admin_name'])) {
 
 if (isset($_POST['submit'])) {
 
-   $name = mysqli_real_escape_string($conn, $_POST['name']);
+
    $email = mysqli_real_escape_string($conn, $_POST['email']);
    $pass = md5($_POST['password']);
-   $cpass = md5($_POST['cpassword']);
-   $user_type = $_POST['tipo_usuario'];
 
-   $select = " SELECT * FROM usuarios WHERE correo = '$email' && contrasena = '$pass' ";
+   $select = " SELECT * FROM adminsresponsables WHERE correo = '$email' && contrasena = '$pass' ";
 
    $result = mysqli_query($conn, $select);
 
@@ -35,7 +33,7 @@ if (isset($_POST['submit'])) {
          $_SESSION['id_admin'] = $row['id'];
 
          header('location:admin_page.php');
-      } elseif ($row['tipo_usuario'] == 'user') {
+      } elseif ($row['tipo_usuario'] == 'respon') {
 
          $_SESSION['nombre_usuario'] = $row['nombre'];
 
@@ -44,7 +42,11 @@ if (isset($_POST['submit'])) {
          header('location:user_page.php');
       }
    } else {
-      $error[] = 'incorrect email or password!';
+      $error[] = '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-octagon me-1"></i>
+      Correo o contraseña incorrectos
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>';
    }
 };
 ?>

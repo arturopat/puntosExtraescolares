@@ -10,7 +10,7 @@ if (isset($_POST['submit'])) {
    $cpass = md5($_POST['cpassword']);
    $user_type = $_POST['tipo_usuario'];
 
-   $select = " SELECT * FROM usuarios WHERE correo = '$email' && contrasena = '$pass' ";
+   $select = " SELECT * FROM adminsresponsables WHERE correo = '$email' && contrasena = '$pass' ";
 
    $result = mysqli_query($conn, $select);
 
@@ -22,7 +22,7 @@ if (isset($_POST['submit'])) {
       if ($pass != $cpass) {
          $error[] = 'password not matched!';
       } else {
-         $insert = "INSERT INTO usuarios(nombre, correo, contrasena, tipo_usuario) VALUES('$name','$email','$pass','$user_type')";
+         $insert = "INSERT INTO adminsresponsables(nombre, correo, contrasena, tipo_usuario) VALUES('$name','$email','$pass','$user_type')";
          mysqli_query($conn, $insert);
          header('location:login_form.php');
       }
@@ -139,7 +139,7 @@ if (isset($_POST['submit'])) {
                                     <div class="col-md-4">
                                        <div class="form-floating mb-3">
                                           <select name="tipo_usuario" class="form-select" id="floatingSelect" aria-label="State">
-                                             <option value="user">user</option>
+                                             <option value="respon">Responsable</option>
                                              <option value="admin">admin</option>
                                           </select>
                                           <label for="floatingSelect">Tipo de Usuario</label>
