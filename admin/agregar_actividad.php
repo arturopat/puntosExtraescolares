@@ -92,7 +92,7 @@ if (!isset($_SESSION['admin_name'])) {
     $stmt->close();
 
     // Cerrar conexión
-    $conn->close();
+
     ?>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
@@ -217,54 +217,83 @@ if (!isset($_SESSION['admin_name'])) {
                         <div class="card-body">
                             <h5 class="card-title">General Form Elements</h5>
 
+                            <?php
+
+
+                            if ($_POST) {
+
+                                $actividad = $_POST['actividad'];
+                                $fecha_inicio = $_POST['fecha_inicio'];
+                                $fecha_finalizacion = $_POST['fecha_finalizacion'];
+                                $horario = $_POST['horario'];
+                                $puntos = $_POST['puntos'];
+                                $cupo = $_POST['cupo'];
+                                $lstresponsable = $_POST['lstresponsable'];
+
+
+
+                                $insert = "INSERT INTO `actividades` (`id_actividad`, `nombre_actividad`, `fecha_inicio`, `fecha_finalizacion`, `horario`, `puntos`, `cupo_disponible`, `id_responsable`) VALUES (NULL, '$actividad', '$fecha_inicio', '$fecha_finalizacion', '$horario', '$puntos', '$cupo', '$lstresponsable')";
+
+
+                                mysqli_query($conn, $insert);
+                                echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/actividades.php';</script>";
+                            }
+                            ?>
+
                             <!-- General Form Elements -->
-                            <form>
+                            <form method="post" id="myForm">
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Actividad</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control">
+                                        <input type="text" name="actividad" class="form-control">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputEmail" class="col-sm-2 col-form-label">Fecha Inicio</label>
                                     <div class="col-sm-10">
-                                        <input type="date" class="form-control">
+                                        <input type="date" name="fecha_inicio" class="form-control">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputEmail" class="col-sm-2 col-form-label">Fecha Finalizacion</label>
                                     <div class="col-sm-10">
-                                        <input type="date" class="form-control">
+                                        <input type="date" name="fecha_finalizacion" class="form-control">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Horario</label>
                                     <div class="col-sm-10">
-                                        <input type="time" class="form-control">
+                                        <input type="time" name="horario" class="form-control">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Puntos</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control">
+                                        <input type="text" name="puntos" class="form-control">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Cupo</label>
                                     <div class="col-sm-10">
-                                        <input type="text" class="form-control">
+                                        <input type="text" name="cupo" class="form-control">
                                     </div>
                                 </div>
+
 
 
                                 <div class="row mb-3">
                                     <label class="col-sm-2 col-form-label">ID Responsable</label>
                                     <div class="col-sm-10">
-                                        <select class="form-select" aria-label="Default select example">
+                                        <select class="form-select" name="lstresponsable" aria-label="Default select example">
                                             <option selected>Open this select menu</option>
-                                            <option value="1">One</option>
-                                            <option value="2">Two</option>
-                                            <option value="3">Three</option>
+                                            <?php
+
+                                            $sql = "SELECT id,nombre FROM adminsresponsables WHERE tipo_usuario = 'respon'";
+                                            $result = $conn->query($sql);
+
+                                            foreach ($result as $row) {
+                                                echo "<option value='" . $row['id'] . "'>" . $row['nombre'] . "</option>";
+                                            } ?>
                                         </select>
                                     </div>
                                 </div>
