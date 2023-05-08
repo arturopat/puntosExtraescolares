@@ -1,17 +1,29 @@
 <?php
-
 @include '../config.php';
 
 session_start();
 
 if (!isset($_SESSION['admin_name'])) {
-    header('location:../login_form.php');
+    header('location: ../login_form.php');
 }
 
+$id_actividad = $_GET['ideliminar']; // Obtener el ID de la actividad a editar
 
+// Consulta SQL para obtener los datos de la actividad
+$sql = "SELECT nombre_actividad, fecha_inicio,fecha_finalizacion,horario,puntos,cupo_disponible,id_responsable,url FROM actividades WHERE id_actividad = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_actividad);
+$stmt->execute();
+$stmt->bind_result($nombre_actividad, $fecha_inicio, $fecha_finalizacion, $horario, $puntos, $cupo_disponible, $id_responsable, $url);
+$stmt->fetch();
+$stmt->close();
+
+
+$sql_responsables = "SELECT id, nombre FROM adminsresponsables WHERE tipo_usuario = 'respon'";
+$result_responsables = $conn->query($sql_responsables);
+
+// Resto del código...
 ?>
-
-
 
 
 <!DOCTYPE html>
@@ -184,7 +196,7 @@ if (!isset($_SESSION['admin_name'])) {
             </li><!-- End Dashboard Nav -->
 
             <li class="nav-item">
-                <a class="nav-link " href="admin/actividades.php">
+                <a class="nav-link " href="actividades.php">
                     <i class="bi bi-grid"></i>
                     <span>Actividades</span>
                 </a>
@@ -217,102 +229,132 @@ if (!isset($_SESSION['admin_name'])) {
                         <div class="card-body">
                             <h5 class="card-title">General Form Elements</h5>
 
+
                             <?php
+                            // Verificar si se envió el formulario
+                            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                                // Verificar si el botón de confirmación se envió
+                                if (isset($_POST['confirmacion']) && $_POST['confirmacion'] === 'si') {
+                                    // Aquí puedes realizar el proceso de eliminación de datos
+                                    $sql =  "DELETE FROM `actividades` WHERE `actividades`.`id_actividad` = $id_actividad";
 
+                                    if ($conn->query($sql) === TRUE) {
+                                        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+                                                    <i class='bi bi-check-circle me-1'></i>
+                                                    Se elimino la informacion correctamente
+                                                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                                                    </div>";
+                                        echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/actividades.php';</script>";
+                                    } else {
+                                        echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                                                    <i class='bi bi-exclamation-octagon me-1'></i>
+                                                    A simple danger alert with icon—check it out!
+                                                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                                                    </div> " . $conn->error;
+                                    }
 
-                            if ($_POST) {
-
-                                $actividad = $_POST['actividad'];
-                                $fecha_inicio = $_POST['fecha_inicio'];
-                                $fecha_finalizacion = $_POST['fecha_finalizacion'];
-                                $horario = $_POST['horario'];
-                                $puntos = $_POST['puntos'];
-                                $cupo = $_POST['cupo'];
-                                $lstresponsable = $_POST['lstresponsable'];
-                                $url = $_POST['url'];
-
-
-
-                                $insert = "INSERT INTO `actividades` (`id_actividad`, `nombre_actividad`, `fecha_inicio`, `fecha_finalizacion`, `horario`, `puntos`, `cupo_disponible`, `id_responsable`, `url`) VALUES (NULL, '$actividad', '$fecha_inicio', '$fecha_finalizacion', '$horario', '$puntos', '$cupo', '$lstresponsable','$url')";
-
-
-                                mysqli_query($conn, $insert);
-                                echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/actividades.php';</script>";
+                                    $conn->close();
+                                }
                             }
                             ?>
+
+
+
+
+
 
                             <!-- General Form Elements -->
                             <form method="post" id="myForm">
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Actividad</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="actividad" class="form-control">
+                                        <input type="text" name="actividad" class="form-control" disabled value="<?php echo $nombre_actividad; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputEmail" class="col-sm-2 col-form-label">Fecha Inicio</label>
                                     <div class="col-sm-10">
-                                        <input type="date" name="fecha_inicio" class="form-control">
+                                        <input type="date" name="fecha_inicio" class="form-control" disabled value="<?php echo $fecha_inicio; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputEmail" class="col-sm-2 col-form-label">Fecha Finalizacion</label>
                                     <div class="col-sm-10">
-                                        <input type="date" name="fecha_finalizacion" class="form-control">
+                                        <input type="date" name="fecha_finalizacion" class="form-control" disabled value="<?php echo $fecha_finalizacion; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Horario</label>
                                     <div class="col-sm-10">
-                                        <input type="time" name="horario" class="form-control">
+                                        <input type="time" name="horario" class="form-control" disabled value="<?php echo $horario; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Puntos</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="puntos" class="form-control">
+                                        <input type="text" name="puntos" class="form-control" disabled value="<?php echo $puntos; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Cupo</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="cupo" class="form-control">
-                                    </div>
-                                </div>
-
-
-
-                                <div class="row mb-3">
-                                    <label class="col-sm-2 col-form-label">ID Responsable</label>
-                                    <div class="col-sm-10">
-                                        <select class="form-select" name="lstresponsable" aria-label="Default select example">
-                                            <option selected>Open this select menu</option>
-                                            <?php
-
-                                            $sql = "SELECT id,nombre FROM adminsresponsables WHERE tipo_usuario = 'respon'";
-                                            $result = $conn->query($sql);
-
-                                            foreach ($result as $row) {
-                                                echo "<option value='" . $row['id'] . "'>" . $row['nombre'] . "</option>";
-                                            } ?>
-                                        </select>
+                                        <input type="text" name="cupo" class="form-control" disabled value="<?php echo $cupo_disponible; ?>">
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">URL</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="url" class="form-control">
+                                        <input type="text" name="cupo" class="form-control" disabled value="<?php echo $url; ?>">
+                                    </div>
+                                </div>
+
+
+                                <div class="row mb-3">
+                                    <label class="col-sm-2 col-form-label">ID Responsable</label>
+                                    <div class="col-sm-10">
+                                        <select class="form-select" disabled name="lstresponsable" aria-label="Default select example">
+                                            <option selected>Open this select menu</option>
+                                            <?php
+                                            foreach ($result_responsables as $row_responsable) {
+                                                $selected = ($row_responsable['id'] == $id_responsable) ? 'selected' : ''; // Verifica si el responsable es el seleccionado
+                                                echo "<option  value='" . $row_responsable['id'] . "' $selected>" . $row_responsable['nombre'] . "</option>";
+                                            }
+                                            ?>
+                                        </select>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <div class="col-sm-10">
-                                        <button type="submit" class="btn btn-primary">Submit Form</button>
+                                        <!-- Botón de eliminar que abre el modal -->
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmModal">Eliminar</button>
                                     </div>
                                 </div>
 
                             </form><!-- End General Form Elements -->
+                            <!-- Modal de confirmación -->
+                            <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="confirmModalLabel">Confirmar eliminación</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ¿Estás seguro de que deseas eliminar estos datos?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form method="post" id="myForm"> <!-- Agrega el formulario aquí -->
+                                                <!-- Botones de confirmación y cancelación -->
+                                                <button type="submit" class="btn btn-danger" name="confirmacion" value="si">Sí</button>
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
 
                         </div>
                     </div>

@@ -92,7 +92,7 @@ if (!isset($_SESSION['admin_name'])) {
    $stmt->close();
 
    // Cerrar conexión
-   $conn->close();
+
    ?>
    <!-- ======= Header ======= -->
    <header id="header" class="header fixed-top d-flex align-items-center">
@@ -177,18 +177,24 @@ if (!isset($_SESSION['admin_name'])) {
       <ul class="sidebar-nav" id="sidebar-nav">
 
          <li class="nav-item">
-            <a class="nav-link " href="index.html">
+            <a class="nav-link " href="admin_page.php">
                <i class="bi bi-grid"></i>
                <span>Dashboard</span>
             </a>
          </li><!-- End Dashboard Nav -->
 
+
+
          <li class="nav-item">
-            <a class="nav-link " href="admin/actividades.php">
-               <i class="bi bi-grid"></i>
+            <a class="nav-link collapsed" href="admin/actividades.php">
+               <i class="bi bi-person"></i>
                <span>Actividades</span>
             </a>
-         </li><!-- End Dashboard Nav -->
+         </li>
+
+
+
+
       </ul>
 
 
@@ -208,6 +214,33 @@ if (!isset($_SESSION['admin_name'])) {
       </div><!-- End Page Title -->
 
       <section class="section dashboard">
+
+         <?php
+         $sql_responsables = "SELECT * FROM actividades";
+         $result_responsables = $conn->query($sql_responsables);
+         echo "<div class='row'>";
+         foreach ($result_responsables as $resultado) {
+            echo "<div class='col-md-6'>";
+            echo "  <div class='card mb-3'>";
+            echo "    <div class='row g-0'>";
+            echo "      <div class='col-6'>";
+            echo "        <img src='" . $resultado['url'] . "' class='card-img' alt='...' style='width: 300px; height: 230px; object-fit: cover;'>";
+            echo "      </div>";
+            echo "      <div class='col-6'>";
+            echo "        <div class='card-body'>";
+            echo "          <h5 class='card-title'>" . $resultado['nombre_actividad'] . "</h5>";
+            echo "          <p class='card-text'><b>Inicia: </b>" . $resultado['fecha_inicio'] . "</p>";
+            echo "          <p class='card-text'><b>Hora: </b>" . $resultado['horario'] . "</p>";
+            echo "          <p class='card-text'><b>Puntos: </b>" . $resultado['puntos'] . "</p>";
+            echo "        </div>";
+            echo "      </div>";
+            echo "    </div>";
+            echo "  </div>";
+            echo "</div>";
+         }
+         echo "</div>";
+         ?>
+
 
 
          <?php

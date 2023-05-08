@@ -12,44 +12,55 @@ if (isset($_SESSION['admin_name'])) {
    header('location:admin_page.php');
 }
 
+if (isset($_SESSION['nombre_alumno'])) {
+   header('location:alumno_page.php');
+}
+
 if (isset($_POST['submit'])) {
-
-
    $email = mysqli_real_escape_string($conn, $_POST['email']);
    $pass = md5($_POST['password']);
 
-   $select = " SELECT * FROM adminsresponsables WHERE correo = '$email' && contrasena = '$pass' ";
+   // Verificar si el usuario es un administrador
+   $select_admin = "SELECT * FROM adminsresponsables WHERE correo = '$email' AND contrasena = '$pass'";
+   $result_admin = mysqli_query($conn, $select_admin);
 
-   $result = mysqli_query($conn, $select);
-
-   if (mysqli_num_rows($result) > 0) {
-
-      $row = mysqli_fetch_array($result);
+   if (mysqli_num_rows($result_admin) > 0) {
+      $row = mysqli_fetch_array($result_admin);
 
       if ($row['tipo_usuario'] == 'admin') {
-
          $_SESSION['admin_name'] = $row['nombre'];
-
          $_SESSION['id_admin'] = $row['id'];
-
          header('location:admin_page.php');
       } elseif ($row['tipo_usuario'] == 'respon') {
-
          $_SESSION['nombre_usuario'] = $row['nombre'];
-
          $_SESSION['id_usuario'] = $row['id'];
-
          header('location:user_page.php');
       }
    } else {
-      $error[] = '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-      <i class="bi bi-exclamation-octagon me-1"></i>
-      Correo o contraseña incorrectos
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>';
+      // Verificar si el usuario es un alumno
+      $select_alumno = "SELECT * FROM alumnos WHERE correo = '$email' AND contrasena = '$pass'";
+      $result_alumno = mysqli_query($conn, $select_alumno);
+
+
+      if (mysqli_num_rows($result_alumno) > 0) {
+         $row = mysqli_fetch_array($result_alumno);
+         $_SESSION['nombre_alumno'] = $row['nombres'];
+         $_SESSION['id_alumno'] = $row['id'];
+         header('location:alumno_page.php');
+      } else {
+         $error[] = '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+         <i class="bi bi-exclamation-octagon me-1"></i>
+         Correo o contraseña incorrectos
+         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+         </div>';
+      }
    }
-};
+}
+
 ?>
+
+
+<!-- Resto del código HTML -->
 
 
 <!DOCTYPE html>

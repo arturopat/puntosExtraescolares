@@ -161,6 +161,14 @@ if (!isset($_SESSION['admin_name'])) {
             </li><!-- End Dashboard Nav -->
 
 
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="actividades.php">
+                    <i class="bi bi-person"></i>
+                    <span>Actividades</span>
+                </a>
+            </li>
+
+
         </ul>
 
     </aside><!-- End Sidebar-->

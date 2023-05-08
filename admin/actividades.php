@@ -1,15 +1,15 @@
-4<?php
+<?php
 
-    @include '../config.php';
+@include '../config.php';
 
-    session_start();
+session_start();
 
-    if (!isset($_SESSION['admin_name'])) {
-        header('location: ../login_form.php');
-    }
+if (!isset($_SESSION['admin_name'])) {
+    header('location: ../login_form.php');
+}
 
 
-    ?>
+?>
 
 
 
@@ -180,11 +180,21 @@
             </li><!-- End Dashboard Nav -->
 
             <li class="nav-item">
-                <a class="nav-link " href="admin/actividades.php">
-                    <i class="bi bi-grid"></i>
+                <a class="nav-link collapsed" href="actividades.php">
+                    <i class="bi bi-person"></i>
                     <span>Actividades</span>
                 </a>
-            </li><!-- End Dashboard Nav -->
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="users-profile.html">
+                    <i class="bi bi-person"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+
+
+
         </ul>
 
 
@@ -230,6 +240,8 @@
                                             <th data-sortable="true"><a href="#">Puntos</a></th>
                                             <th data-sortable="true"><a href="#">Cupo</a></th>
                                             <th data-sortable="true"><a href="#">Responsable</a></th>
+                                            <th>&nbsp;</th>
+                                            <th>&nbsp;</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -251,6 +263,9 @@
                                             echo "<td>" . $fila['puntos'] . "</td>";
                                             echo "<td>" . $fila['cupo_disponible'] . "</td>";
                                             echo "<td>" . $fila['id_responsable'] . "</td>";
+                                            echo '<td> <a href= "actividadeditar.php?ideditar=' . $fila['id_actividad'] . ' " class="btn btn-warning ri-edit-box-fill"> </td>';
+                                            echo '<td> <a href= "actividadeliminar.php?ideliminar=' . $fila['id_actividad'] . ' " class="btn btn-danger ri-delete-bin-6-line"> </td>';
+
                                             echo "</tr>";
                                         }
 

@@ -1,17 +1,29 @@
 <?php
-
 @include '../config.php';
 
 session_start();
 
 if (!isset($_SESSION['admin_name'])) {
-    header('location:../login_form.php');
+    header('location: ../login_form.php');
 }
 
+$id_actividad = $_GET['ideditar']; // Obtener el ID de la actividad a editar
 
+// Consulta SQL para obtener los datos de la actividad
+$sql = "SELECT nombre_actividad, fecha_inicio,fecha_finalizacion,horario,puntos,cupo_disponible,id_responsable,url FROM actividades WHERE id_actividad = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_actividad);
+$stmt->execute();
+$stmt->bind_result($nombre_actividad, $fecha_inicio, $fecha_finalizacion, $horario, $puntos, $cupo_disponible, $id_responsable, $url);
+$stmt->fetch();
+$stmt->close();
+
+
+$sql_responsables = "SELECT id, nombre FROM adminsresponsables WHERE tipo_usuario = 'respon'";
+$result_responsables = $conn->query($sql_responsables);
+
+// Resto del código...
 ?>
-
-
 
 
 <!DOCTYPE html>
@@ -21,7 +33,7 @@ if (!isset($_SESSION['admin_name'])) {
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <title>Panel Administrador</title>
+    <title>Editar actividad</title>
     <meta content="" name="description">
     <meta content="" name="keywords">
 
@@ -218,65 +230,85 @@ if (!isset($_SESSION['admin_name'])) {
                             <h5 class="card-title">General Form Elements</h5>
 
                             <?php
+                            include '../config.php';
 
-
-                            if ($_POST) {
-
+                            if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 $actividad = $_POST['actividad'];
-                                $fecha_inicio = $_POST['fecha_inicio'];
-                                $fecha_finalizacion = $_POST['fecha_finalizacion'];
-                                $horario = $_POST['horario'];
+                                $fecha = $_POST['fecha_inicio'];
+                                $fechafin = $_POST['fecha_finalizacion'];
+                                $hora = $_POST['horario'];
                                 $puntos = $_POST['puntos'];
                                 $cupo = $_POST['cupo'];
-                                $lstresponsable = $_POST['lstresponsable'];
+                                $lst = $_POST['lstresponsable'];
                                 $url = $_POST['url'];
 
 
+                                // Realizar el update
+                                $sql = "UPDATE actividades SET nombre_actividad='$actividad',fecha_inicio='$fecha', fecha_finalizacion='$fechafin',horario='$hora',puntos='$puntos',cupo_disponible='$cupo',id_responsable='$lst',url='$url' WHERE id_actividad=$id_actividad";
 
-                                $insert = "INSERT INTO `actividades` (`id_actividad`, `nombre_actividad`, `fecha_inicio`, `fecha_finalizacion`, `horario`, `puntos`, `cupo_disponible`, `id_responsable`, `url`) VALUES (NULL, '$actividad', '$fecha_inicio', '$fecha_finalizacion', '$horario', '$puntos', '$cupo', '$lstresponsable','$url')";
+                                if ($conn->query($sql) === TRUE) {
+                                    echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+                            <i class='bi bi-check-circle me-1'></i>
+                            Se actualizo correctamente la informacion
+                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                          </div>";
+                                    echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/actividades.php';</script>";
+                                } else {
+                                    echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                <i class='bi bi-exclamation-octagon me-1'></i>
+                A simple danger alert with icon—check it out!
+                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+              </div> " . $conn->error;
+                                }
 
-
-                                mysqli_query($conn, $insert);
-                                echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/actividades.php';</script>";
+                                $conn->close();
                             }
                             ?>
+
 
                             <!-- General Form Elements -->
                             <form method="post" id="myForm">
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Actividad</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="actividad" class="form-control">
+                                        <input type="text" name="actividad" class="form-control" value="<?php echo $nombre_actividad; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputEmail" class="col-sm-2 col-form-label">Fecha Inicio</label>
                                     <div class="col-sm-10">
-                                        <input type="date" name="fecha_inicio" class="form-control">
+                                        <input type="date" name="fecha_inicio" class="form-control" value="<?php echo $fecha_inicio; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputEmail" class="col-sm-2 col-form-label">Fecha Finalizacion</label>
                                     <div class="col-sm-10">
-                                        <input type="date" name="fecha_finalizacion" class="form-control">
+                                        <input type="date" name="fecha_finalizacion" class="form-control" value="<?php echo $fecha_finalizacion; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Horario</label>
                                     <div class="col-sm-10">
-                                        <input type="time" name="horario" class="form-control">
+                                        <input type="time" name="horario" class="form-control" value="<?php echo $horario; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Puntos</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="puntos" class="form-control">
+                                        <input type="text" name="puntos" class="form-control" value="<?php echo $puntos; ?>">
                                     </div>
                                 </div>
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Cupo</label>
                                     <div class="col-sm-10">
-                                        <input type="text" name="cupo" class="form-control">
+                                        <input type="text" name="cupo" class="form-control" value="<?php echo $cupo_disponible; ?>">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">URL</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="url" class="form-control" value="<?php echo $url; ?>">
                                     </div>
                                 </div>
 
@@ -288,23 +320,16 @@ if (!isset($_SESSION['admin_name'])) {
                                         <select class="form-select" name="lstresponsable" aria-label="Default select example">
                                             <option selected>Open this select menu</option>
                                             <?php
-
-                                            $sql = "SELECT id,nombre FROM adminsresponsables WHERE tipo_usuario = 'respon'";
-                                            $result = $conn->query($sql);
-
-                                            foreach ($result as $row) {
-                                                echo "<option value='" . $row['id'] . "'>" . $row['nombre'] . "</option>";
-                                            } ?>
+                                            foreach ($result_responsables as $row_responsable) {
+                                                $selected = ($row_responsable['id'] == $id_responsable) ? 'selected' : ''; // Verifica si el responsable es el seleccionado
+                                                echo "<option value='" . $row_responsable['id'] . "' $selected>" . $row_responsable['nombre'] . "</option>";
+                                            }
+                                            ?>
                                         </select>
                                     </div>
                                 </div>
 
-                                <div class="row mb-3">
-                                    <label for="inputText" class="col-sm-2 col-form-label">URL</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" name="url" class="form-control">
-                                    </div>
-                                </div>
+
 
                                 <div class="row mb-3">
                                     <div class="col-sm-10">

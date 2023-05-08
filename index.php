@@ -13,43 +13,36 @@ if (isset($_SESSION['admin_name'])) {
 @include "header.php";
 ?>
 
-<div class="col-lg-6">
 
 
 
-    <!-- Card with an image on left -->
-    <div class="card mb-3">
-        <div class="row g-0">
-            <div class="col-md-4">
-                <img src="assets/img/card.jpg" class="img-fluid rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <a href="login_form.php">
-                        <h5 class="card-title">Card with an image on left</h5>
-                    </a>
-                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                </div>
-            </div>
-        </div>
-    </div><!-- End Card with an image on left -->
 
-    <!-- Card with an image on left -->
-    <div class="card mb-3">
-        <div class="row g-0">
-            <div class="col-md-4">
-                <img src="assets/img/card.jpg" class="img-fluid rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <h5 class="card-title">Card with an image on left</h5>
-                    <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                </div>
-            </div>
-        </div>
-    </div><!-- End Card with an image on left -->
-
-</div>
+<?php
+$sql_responsables = "SELECT * FROM actividades";
+$result_responsables = $conn->query($sql_responsables);
+echo "<div class='row'>";
+foreach ($result_responsables as $resultado) {
+    echo "<div class='col-md-6'>";
+    echo "  <div class='card mb-3'>";
+    echo "    <div class='row g-0'>";
+    echo "      <div class='col-6'>";
+    echo "        <img src='" . $resultado['url'] . "' class='card-img' alt='...' style='width: 300px; height: 230px; object-fit: cover;'>";
+    echo "      </div>";
+    echo "      <div class='col-6'>";
+    echo "        <div class='card-body'>";
+    echo "        <a href='login_form.php'><h5 class='card-title'>" . $resultado['nombre_actividad'] . "</h5></a>";
+    echo "          <p class='card-text'><b>Inicia: </b>" . $resultado['fecha_inicio'] . "</p>";
+    echo "          <p class='card-text'><b>Hora: </b>" . $resultado['horario'] . "</p>";
+    echo "          <p class='card-text'><b>Puntos: </b>" . $resultado['puntos'] . "</p>";
+    echo "        </div>";
+    echo "      </div>";
+    echo "    </div>";
+    echo "  </div>";
+    echo "</div>";
+}
+echo "</div>";
+?>
+<a href=""></a>
 
 <?php
 @include "footer.php";

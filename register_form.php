@@ -151,7 +151,10 @@ if (isset($_POST['submit'])) {
                                        <input type="submit" name="submit" value="Crear cuenta" class="btn btn-primary w-100">
                                     </div>
                                     <div class="col-12">
-                                       <p class="small mb-0">Already have an account? <a href="login_form.php">Log in</a></p>
+                                       <p class="small mb-0">Nuevo alumno? <a href="register_form_alumno.php">Registrar</a></p>
+                                    </div>
+                                    <div class="col-12">
+                                       <p class="small mb-0">Ya tienes una cuenta? <a href="login_form.php">Iniciar sesion</a></p>
                                     </div>
 
 
