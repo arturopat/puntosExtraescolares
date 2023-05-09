@@ -34,7 +34,7 @@ if (isset($_POST['submit'])) {
       } elseif ($row['tipo_usuario'] == 'respon') {
          $_SESSION['nombre_usuario'] = $row['nombre'];
          $_SESSION['id_usuario'] = $row['id'];
-         header('location:user_page.php');
+         header('location:responsables/responsables.php');
       }
    } else {
       // Verificar si el usuario es un alumno
@@ -46,7 +46,7 @@ if (isset($_POST['submit'])) {
          $row = mysqli_fetch_array($result_alumno);
          $_SESSION['nombre_alumno'] = $row['nombres'];
          $_SESSION['id_alumno'] = $row['id'];
-         header('location:alumno_page.php');
+         header('location:alumnos/alumno_page.php');
       } else {
          $error[] = '<div class="alert alert-danger alert-dismissible fade show" role="alert">
          <i class="bi bi-exclamation-octagon me-1"></i>

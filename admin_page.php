@@ -192,6 +192,13 @@ if (!isset($_SESSION['admin_name'])) {
             </a>
          </li>
 
+         <li class="nav-item">
+            <a class="nav-link collapsed" href="admin/alumnos.php">
+               <i class="bi bi-person"></i>
+               <span>Alumnos</span>
+            </a>
+         </li>
+
 
 
 
