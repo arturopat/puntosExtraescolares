@@ -23,6 +23,7 @@ $stmt->close();
 
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -230,6 +231,10 @@ $stmt->close();
                         <div class="card-body">
                             <h5 class="card-title">General Form Elements</h5>
 
+
+
+
+
                             <?php
                             // ...
 
@@ -237,10 +242,19 @@ $stmt->close();
                                 $id_actividad = $_POST['id_actividad'];
                                 $id_alumno = $_POST['id_alumno'];
                                 $fechaRegistro = date('Y-m-d');
+                                $id_responsable = $_POST['id_responsable'];
 
-                                // Agrega código aquí para verificar si el alumno ya está registrado en alguna actividad
+                                // Conectar a la base de datos
+                                $conexion = new mysqli('localhost', 'root', '', 'proyecto');
+
+                                // Verificar si hay conexión exitosa
+                                if ($conexion->connect_error) {
+                                    die("Error de conexión: " . $conexion->connect_error);
+                                }
+
+                                // Verificar si el alumno ya está registrado en alguna actividad
                                 $sql = "SELECT COUNT(*) FROM registroactividades WHERE id_alumno = ?";
-                                $stmt = $conn->prepare($sql);
+                                $stmt = $conexion->prepare($sql);
                                 $stmt->bind_param("i", $id_alumno);
                                 $stmt->execute();
                                 $stmt->bind_result($count);
@@ -250,17 +264,52 @@ $stmt->close();
                                 if ($count > 0) {
                                     // El alumno ya está registrado en alguna actividad
                                     echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    El alumno ya está registrado en alguna actividad
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                  </div>';
+            El alumno ya está registrado en alguna actividad
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>';
                                 } else {
-                                    // El alumno no está registrado en ninguna actividad, procede con la inscripción
-                                    $insert = "INSERT INTO `registroactividades` (`id_actividad`, `id_alumno`, `id_responsable`, `fecha_registro`) VALUES ('$id_actividad', '$id_alumno', 1, '$fechaRegistro')";
-                                    mysqli_query($conn, $insert);
-                                    echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/alumnos/registrarse.php';</script>";
+                                    // Obtener el cupo disponible de la actividad
+                                    $sql = "SELECT cupo_disponible FROM actividades WHERE id_actividad = $id_actividad";
+                                    $resultado = $conexion->query($sql);
+
+                                    if ($resultado->num_rows > 0) {
+                                        $fila = $resultado->fetch_assoc();
+                                        $cupoDisponible = $fila['cupo_disponible'];
+
+                                        // Verificar si aún hay cupo disponible
+                                        if ($cupoDisponible > 0) {
+                                            // Insertar el registro en la tabla registroactividades
+                                            $sqlInsert = "INSERT INTO registroactividades (id_actividad, id_alumno, id_responsable, fecha_registro) VALUES ($id_actividad, $id_alumno, $id_responsable, '$fechaRegistro')";
+                                            if ($conexion->query($sqlInsert) === true) {
+                                                // Actualizar el cupo disponible en la tabla actividades
+                                                $sqlUpdate = "UPDATE actividades SET cupo_disponible = cupo_disponible - 1 WHERE id_actividad = $id_actividad";
+                                                $conexion->query($sqlUpdate);
+
+                                                echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/alumnos/registrarse.php';</script>";
+                                            } else {
+                                                echo "Error al realizar el registro: " . $conexion->error;
+                                            }
+                                        } else {
+                                            echo '<div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                            Lo sentimos, todos los cupos para esta actividad han sido ocupados.!
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                          </div>';
+                                        }
+                                    } else {
+                                        echo "No se encontró la actividad especificada.";
+                                    }
                                 }
+
+                                // Cerrar la conexión a la base de datos
+                                $conexion->close();
                             }
                             ?>
+
+
+
+
+
+
 
                             <!-- General Form Elements -->
                             <form method="post" id="myForm">
@@ -274,6 +323,13 @@ $stmt->close();
                                     <label for="inputEmail" class="col-sm-2 col-form-label">Alumno</label>
                                     <div class="col-sm-10">
                                         <input type="text" name="id_alumno" class="form-control" value="<?php echo $id ?>" placeholder="<?php echo $nombres; ?>">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="inputEmail" class="col-sm-2 col-form-label">ID Responsable</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name="id_responsable" class="form-control" value="<?php echo $id_responsable ?>" placeholder="<?php echo $nombres; ?>">
                                     </div>
                                 </div>
 

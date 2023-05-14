@@ -200,6 +200,14 @@ if (!isset($_SESSION['admin_name'])) {
          </li>
 
 
+         <li class="nav-item">
+            <a class="nav-link collapsed" href="admin/responsables.php">
+               <i class="bi bi-person"></i>
+               <span>Responsables</span>
+            </a>
+         </li>
+
+
 
 
       </ul>

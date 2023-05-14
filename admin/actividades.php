@@ -187,9 +187,9 @@ if (!isset($_SESSION['admin_name'])) {
             </li>
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="users-profile.html">
+                <a class="nav-link collapsed" href="alumnos.php">
                     <i class="bi bi-person"></i>
-                    <span>Profile</span>
+                    <span>Alumnos</span>
                 </a>
             </li>
 

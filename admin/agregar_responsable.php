@@ -4,7 +4,7 @@
 
 session_start();
 
-if (!isset($_SESSION['nombre_usuario'])) {
+if (!isset($_SESSION['admin_name'])) {
     header('location:../login_form.php');
 }
 
@@ -60,7 +60,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
     <?php
     @include '../config.php';
 
-    $id_responsable = $_SESSION['id_usuario'];
+    $id_admin = $_SESSION['id_admin'];
 
     // Consulta SQL para obtener los datos del usuario
     $sql = "SELECT id, nombre, correo, tipo_usuario FROM adminsresponsables WHERE id = ?";
@@ -69,7 +69,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
     $stmt = $conn->prepare($sql);
 
     // Vincular el ID de administrador a la consulta
-    $stmt->bind_param("i", $id_responsable);
+    $stmt->bind_param("i", $id_admin);
 
     // Ejecutar la consulta
     $stmt->execute();
@@ -125,10 +125,8 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li class="dropdown-header">
-
                             <h6><?php echo $nombre; ?></h6>
-
-                            <span>Solo soy un alumno</span>
+                            <span>Solo soy un admin</span>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
@@ -145,7 +143,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="login_form.php">
+                            <a class="dropdown-item d-flex align-items-center" href="../login_form.php">
                                 <i class="bi bi-gear"></i>
                                 <span>Account Settings</span>
                             </a>
@@ -179,22 +177,18 @@ if (!isset($_SESSION['nombre_usuario'])) {
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link " href="responsables.php">
+                <a class="nav-link " href="../admin_page.php">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
                 </a>
             </li><!-- End Dashboard Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="participantes.php">
-                    <i class="bi bi-person"></i>
-                    <span>Participantes</span>
+                <a class="nav-link " href="admin/actividades.php">
+                    <i class="bi bi-grid"></i>
+                    <span>Actividades</span>
                 </a>
-            </li>
-
-
-
-
+            </li><!-- End Dashboard Nav -->
         </ul>
 
 
@@ -204,12 +198,11 @@ if (!isset($_SESSION['nombre_usuario'])) {
     <main id="main" class="main">
 
         <div class="pagetitle">
-            <h1>Dashboard</h1>
-
+            <h1>Agregar Actividad</h1>
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="login_form.php">Home</a></li>
-                    <li class="breadcrumb-item active">Dashboard</li>
+                    <li class="breadcrumb-item active">Agregar Actividad</li>
                 </ol>
             </nav>
         </div><!-- End Page Title -->
@@ -217,32 +210,97 @@ if (!isset($_SESSION['nombre_usuario'])) {
         <section class="section dashboard">
 
 
-            <?php
-            $sql_responsables = "SELECT * FROM actividades";
-            $result_responsables = $conn->query($sql_responsables);
-            echo "<div class='row'>";
-            foreach ($result_responsables as $resultado) {
-                echo "<div class='col-md-6'>";
-                echo "  <div class='card mb-3'>";
-                echo "    <div class='row g-0'>";
-                echo "      <div class='col-6'>";
-                echo "        <img src='" . $resultado['url'] . "' class='card-img' alt='...' style='width: 300px; height: 230px; object-fit: cover;'>";
-                echo "      </div>";
-                echo "      <div class='col-6'>";
-                echo "        <div class='card-body'>";
-                echo "          <h5 class='card-title'>" . $resultado['nombre_actividad'] . "</h5>";
-                echo "          <p class='card-text'><b>Inicia: </b>" . $resultado['fecha_inicio'] . "</p>";
-                echo "          <p class='card-text'><b>Hora: </b>" . $resultado['horario'] . "</p>";
-                echo "          <p class='card-text'><b>Puntos: </b>" . $resultado['puntos'] . "</p>";
-                echo "        </div>";
-                echo "      </div>";
-                echo "    </div>";
-                echo "  </div>";
-                echo "</div>";
-            }
-            echo "</div>";
-            ?>
+            <div class="row">
+                <div class="col-lg-8">
 
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">General Form Elements</h5>
+
+                            <?php
+
+
+                            if ($_POST) {
+
+                                $name = mysqli_real_escape_string($conn, $_POST['name']);
+                                $email = mysqli_real_escape_string($conn, $_POST['email']);
+                                $pass = md5($_POST['password']);
+                                $cpass = md5($_POST['cpassword']);
+                                $user_type = $_POST['tipo_usuario'];
+
+                                $select = " SELECT * FROM adminsresponsables WHERE correo = '$email' && contrasena = '$pass' ";
+
+                                $result = mysqli_query($conn, $select);
+
+                                if (mysqli_num_rows($result) > 0) {
+
+                                    $error[] = 'user already exist!';
+                                } else {
+
+                                    if ($pass != $cpass) {
+                                        $error[] = 'password not matched!';
+                                    } else {
+                                        $insert = "INSERT INTO adminsresponsables(nombre, correo, contrasena, tipo_usuario) VALUES('$name','$email','$pass','$user_type')";
+                                        mysqli_query($conn, $insert);
+                                        echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/responsables.php';</script>";
+                                    }
+                                }
+                            };
+
+
+
+
+
+                            ?>
+
+                            <!-- General Form Elements -->
+                            <form method="post">
+                                <div class="col-12">
+                                    <label for="yourName" class="form-label">Nombre</label>
+                                    <input type="text" name="name" class="form-control" id="yourName" required>
+                                    <div class="invalid-feedback">Please, enter your name!</div>
+                                </div>
+
+
+                                <div class="col-12">
+                                    <label for="yourName" class="form-label">Correo</label>
+                                    <input type="email" name="email" class="form-control" id="yourName" required>
+                                    <div class="invalid-feedback">Please, enter your name!</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="yourName" class="form-label">Contraseña</label>
+                                    <input type="password" name="password" class="form-control" id="yourName" required>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="yourName" class="form-label">Confirmar Contraseña</label>
+                                    <input type="password" name="cpassword" class="form-control" id="yourName" required>
+                                </div>
+
+                                <br>
+
+                                <div class="col-12">
+                                    <label for="yourName" class="form-label">Usuario</label>
+                                    <input type="text" name="tipo_usuario" value="respon" class="form-control" id="yourName" required>
+                                </div>
+
+
+
+                                <div class="col-12">
+                                    <br>
+                                    <input type="submit" name="submit" value="Crear cuenta" class="btn btn-primary w-100">
+                                </div>
+
+
+                            </form>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
 
             <!-- ======= Footer ======= -->
             <footer id="footer" class="footer">

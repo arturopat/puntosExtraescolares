@@ -5,7 +5,7 @@
 session_start();
 
 if (!isset($_SESSION['nombre_usuario'])) {
-    header('location:../login_form.php');
+    header('location: ../login_form.php');
 }
 
 
@@ -60,7 +60,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
     <?php
     @include '../config.php';
 
-    $id_responsable = $_SESSION['id_usuario'];
+    $id_admin = $_SESSION['id_usuario'];
 
     // Consulta SQL para obtener los datos del usuario
     $sql = "SELECT id, nombre, correo, tipo_usuario FROM adminsresponsables WHERE id = ?";
@@ -69,7 +69,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
     $stmt = $conn->prepare($sql);
 
     // Vincular el ID de administrador a la consulta
-    $stmt->bind_param("i", $id_responsable);
+    $stmt->bind_param("i", $id_admin);
 
     // Ejecutar la consulta
     $stmt->execute();
@@ -94,8 +94,10 @@ if (!isset($_SESSION['nombre_usuario'])) {
     // Cerrar conexión
 
     ?>
+
+
     <!-- ======= Header ======= -->
-    <header id="header" class="header fixed-top d-flex align-items-center">
+    <header id="header" class="header fixed-top d-flex align-items-center ">
 
         <div class="d-flex align-items-center justify-content-between">
             <a href="index.html" class="logo d-flex align-items-center">
@@ -125,10 +127,8 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li class="dropdown-header">
-
                             <h6><?php echo $nombre; ?></h6>
-
-                            <span>Solo soy un alumno</span>
+                            <span>Solo soy un admin</span>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
@@ -144,12 +144,6 @@ if (!isset($_SESSION['nombre_usuario'])) {
                             <hr class="dropdown-divider">
                         </li>
 
-                        <li>
-                            <a class="dropdown-item d-flex align-items-center" href="login_form.php">
-                                <i class="bi bi-gear"></i>
-                                <span>Account Settings</span>
-                            </a>
-                        </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
@@ -195,6 +189,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
 
 
+
         </ul>
 
 
@@ -205,7 +200,6 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
         <div class="pagetitle">
             <h1>Dashboard</h1>
-
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="login_form.php">Home</a></li>
@@ -214,64 +208,122 @@ if (!isset($_SESSION['nombre_usuario'])) {
             </nav>
         </div><!-- End Page Title -->
 
+
+
+
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Datatables</h5>
+
+                        <!-- Table with stripped rows -->
+                        <div class="datatable-wrapper datatable-loading no-footer sortable searchable fixed-columns">
+                            <div class="datatable-container">
+                                <?php
+                                // Obtener el id del responsable que ha iniciado sesión (en este caso, 12)
+                                $id_responsable = $id_admin;
+
+                                // Consulta para obtener los alumnos inscritos en la actividad del responsable
+                                $sql = "SELECT alumnos.id, alumnos.nombres, alumnos.apellidos, alumnos.correo,alumnos.semestre,alumnos.carrera
+        FROM alumnos
+        INNER JOIN registroactividades ON alumnos.id = registroactividades.id_alumno
+        WHERE registroactividades.id_responsable = $id_responsable";
+
+
+                                $result = $conn->query($sql);
+
+                                if (!$result) {
+                                    die("Error en la consulta: " . mysqli_error($conn));
+                                }
+
+                                if ($result->num_rows > 0) {
+                                    echo '<table class="table datatable datatable-table">';
+                                    echo '<thead>';
+                                    echo '<tr>';
+                                    echo '<th data-sortable="true"><a href="#">Nombre</a></th>';
+                                    echo '<th data-sortable="true"><a href="#">Apellidos</a></th>';
+                                    echo '<th data-sortable="true"><a href="#">Correo</a></th>';
+                                    echo '<th data-sortable="true"><a href="#">Semestre</a></th>';
+                                    echo '<th data-sortable="true"><a href="#">Carrera</a></th>';
+                                    echo '</tr>';
+                                    echo '</thead>';
+                                    echo '<tbody>';
+
+                                    // Mostrar los datos de los alumnos
+                                    while ($row = $result->fetch_assoc()) {
+                                        echo '<tr>';
+                                        echo '<td>' . $row["nombres"] . '</td>';
+                                        echo '<td>' . $row["apellidos"] . '</td>';
+                                        echo '<td>' . $row["correo"] . '</td>';
+                                        echo '<td>' . $row["semestre"] . '</td>';
+                                        echo '<td>' . $row["carrera"] . '</td>';
+                                        echo '</tr>';
+                                    }
+
+                                    echo '</tbody>';
+                                    echo '</table>';
+                                } else {
+                                    echo "No hay alumnos inscritos en la actividad del responsable.";
+                                }
+
+                                // Cerrar la conexión
+                                $conn->close();
+                                ?>
+
+
+                            </div>
+                            <div class="datatable-bottom">
+                                <div class="datatable-info">Showing 1 to 5 of 5 entries</div>
+                                <nav class="datatable-pagination">
+                                    <ul class="datatable-pagination-list"></ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <!-- End Table with stripped rows -->
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <section class="section dashboard">
 
 
-            <?php
-            $sql_responsables = "SELECT * FROM actividades";
-            $result_responsables = $conn->query($sql_responsables);
-            echo "<div class='row'>";
-            foreach ($result_responsables as $resultado) {
-                echo "<div class='col-md-6'>";
-                echo "  <div class='card mb-3'>";
-                echo "    <div class='row g-0'>";
-                echo "      <div class='col-6'>";
-                echo "        <img src='" . $resultado['url'] . "' class='card-img' alt='...' style='width: 300px; height: 230px; object-fit: cover;'>";
-                echo "      </div>";
-                echo "      <div class='col-6'>";
-                echo "        <div class='card-body'>";
-                echo "          <h5 class='card-title'>" . $resultado['nombre_actividad'] . "</h5>";
-                echo "          <p class='card-text'><b>Inicia: </b>" . $resultado['fecha_inicio'] . "</p>";
-                echo "          <p class='card-text'><b>Hora: </b>" . $resultado['horario'] . "</p>";
-                echo "          <p class='card-text'><b>Puntos: </b>" . $resultado['puntos'] . "</p>";
-                echo "        </div>";
-                echo "      </div>";
-                echo "    </div>";
-                echo "  </div>";
-                echo "</div>";
-            }
-            echo "</div>";
-            ?>
+        </section>
 
+    </main><!-- End #main -->
 
-            <!-- ======= Footer ======= -->
-            <footer id="footer" class="footer">
-                <div class="copyright">
-                    &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
-                </div>
-                <div class="credits">
-                    <!-- All the links in the footer should remain intact. -->
-                    <!-- You can delete the links only if you purchased the pro version. -->
-                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                    <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-                    Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-                </div>
-            </footer><!-- End Footer -->
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <div class="copyright">
+            &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+        </div>
+        <div class="credits">
+            <!-- All the links in the footer should remain intact. -->
+            <!-- You can delete the links only if you purchased the pro version. -->
+            <!-- Licensing information: https://bootstrapmade.com/license/ -->
+            <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
+            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+        </div>
+    </footer><!-- End Footer -->
 
-            <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-            <!-- Vendor JS Files -->
-            <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
-            <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-            <script src="../assets/vendor/chart.js/chart.umd.js"></script>
-            <script src="../assets/vendor/echarts/echarts.min.js"></script>
-            <script src="../assets/vendor/quill/quill.min.js"></script>
-            <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
-            <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
-            <script src="../assets/vendor/php-email-form/validate.js"></script>
+    <!-- Vendor JS Files -->
+    <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="../assets/vendor/echarts/echarts.min.js"></script>
+    <script src="../assets/vendor/quill/quill.min.js"></script>
+    <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="../assets/vendor/php-email-form/validate.js"></script>
 
-            <!-- Template Main JS File -->
-            <script src="../assets/js/main.js"></script>
+    <!-- Template Main JS File -->
+    <script src="../assets/js/main.js"></script>
 
 </body>
 

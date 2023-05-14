@@ -217,11 +217,13 @@ if (!isset($_SESSION['admin_name'])) {
                         <div class="card-body">
                             <h5 class="card-title">General Form Elements</h5>
 
-                            <?php
 
+
+
+                            <?php
+                            // ... your existing code ...
 
                             if ($_POST) {
-
                                 $actividad = $_POST['actividad'];
                                 $fecha_inicio = $_POST['fecha_inicio'];
                                 $fecha_finalizacion = $_POST['fecha_finalizacion'];
@@ -231,15 +233,29 @@ if (!isset($_SESSION['admin_name'])) {
                                 $lstresponsable = $_POST['lstresponsable'];
                                 $url = $_POST['url'];
 
+                                // Check if id_responsable already exists in actividades table
+                                $stmt = $conn->prepare("SELECT id_responsable FROM actividades WHERE id_responsable = ?");
+                                $stmt->bind_param("i", $lstresponsable);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
 
-
-                                $insert = "INSERT INTO `actividades` (`id_actividad`, `nombre_actividad`, `fecha_inicio`, `fecha_finalizacion`, `horario`, `puntos`, `cupo_disponible`, `id_responsable`, `url`) VALUES (NULL, '$actividad', '$fecha_inicio', '$fecha_finalizacion', '$horario', '$puntos', '$cupo', '$lstresponsable','$url')";
-
-
-                                mysqli_query($conn, $insert);
-                                echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/actividades.php';</script>";
+                                if ($result->num_rows > 0) {
+                                    // id_responsable already exists, display error message
+                                    echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    El responsable ya esta registrado en una actividad
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                  </div>';
+                                } else {
+                                    // id_responsable does not exist, insert data into actividades table
+                                    $insert = "INSERT INTO `actividades` (`id_actividad`, `nombre_actividad`, `fecha_inicio`, `fecha_finalizacion`, `horario`, `puntos`, `cupo_disponible`, `id_responsable`, `url`) VALUES (NULL, '$actividad', '$fecha_inicio', '$fecha_finalizacion', '$horario', '$puntos', '$cupo', '$lstresponsable','$url')";
+                                    mysqli_query($conn, $insert);
+                                    echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/actividades.php';</script>";
+                                }
                             }
+
+                            // ... your existing code ...
                             ?>
+
 
                             <!-- General Form Elements -->
                             <form method="post" id="myForm">
