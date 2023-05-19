@@ -4,7 +4,7 @@
 
 session_start();
 
-if (!isset($_SESSION['admin_name'])) {
+if (!isset($_SESSION['nombre_usuario'])) {
     header('location: ../login_form.php');
 }
 
@@ -57,7 +57,7 @@ if (!isset($_SESSION['admin_name'])) {
     <?php
     @include '../config.php';
 
-    $id_admin = $_SESSION['id_admin'];
+    $id_responsable = $_SESSION['id_usuario'];
 
     // Consulta SQL para obtener los datos del usuario
     $sql = "SELECT id, nombre, correo, tipo_usuario FROM adminsresponsables WHERE id = ?";
@@ -66,7 +66,7 @@ if (!isset($_SESSION['admin_name'])) {
     $stmt = $conn->prepare($sql);
 
     // Vincular el ID de administrador a la consulta
-    $stmt->bind_param("i", $id_admin);
+    $stmt->bind_param("i", $id_responsable);
 
     // Ejecutar la consulta
     $stmt->execute();
@@ -88,9 +88,7 @@ if (!isset($_SESSION['admin_name'])) {
     // Cerrar la consulta
     $stmt->close();
 
-
     // Cerrar conexión
-    $conn->close();
 
     ?>
     <!-- ======= Header ======= -->
@@ -162,26 +160,12 @@ if (!isset($_SESSION['admin_name'])) {
 
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="actividades.php">
+                <a class="nav-link collapsed" href="participantes.php">
                     <i class="bi bi-person"></i>
-                    <span>Actividades</span>
+                    <span>Participantes</span>
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="alumnos.php">
-                    <i class="bi bi-person"></i>
-                    <span>Alumnos</span>
-                </a>
-            </li>
-
-
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="responsables.php">
-                    <i class="bi bi-person"></i>
-                    <span>Responsables</span>
-                </a>
-            </li>
 
 
 

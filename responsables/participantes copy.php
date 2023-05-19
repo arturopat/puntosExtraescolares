@@ -4,7 +4,7 @@
 
 session_start();
 
-if (!isset($_SESSION['admin_name'])) {
+if (!isset($_SESSION['nombre_usuario'])) {
     header('location: ../login_form.php');
 }
 
@@ -44,8 +44,6 @@ if (!isset($_SESSION['admin_name'])) {
 
     <!-- Template Main CSS File -->
     <link href="../assets/css/style.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 
     <!-- =======================================================
   * Template Name: NiceAdmin
@@ -62,7 +60,7 @@ if (!isset($_SESSION['admin_name'])) {
     <?php
     @include '../config.php';
 
-    $id_admin = $_SESSION['id_admin'];
+    $id_admin = $_SESSION['id_usuario'];
 
     // Consulta SQL para obtener los datos del usuario
     $sql = "SELECT id, nombre, correo, tipo_usuario FROM adminsresponsables WHERE id = ?";
@@ -175,32 +173,20 @@ if (!isset($_SESSION['admin_name'])) {
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link " href="../admin_page.php">
+                <a class="nav-link " href="responsables.php">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
                 </a>
             </li><!-- End Dashboard Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="actividades.php">
+                <a class="nav-link collapsed" href="participantes.php">
                     <i class="bi bi-person"></i>
-                    <span>Actividades</span>
+                    <span>Participantes</span>
                 </a>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="alumnos.php">
-                    <i class="bi bi-person"></i>
-                    <span>Alumnos</span>
-                </a>
-            </li>
 
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="responsables.php">
-                    <i class="bi bi-person"></i>
-                    <span>Responsables</span>
-                </a>
-            </li>
 
 
 
@@ -232,88 +218,69 @@ if (!isset($_SESSION['admin_name'])) {
                     <div class="card-body">
                         <h5 class="card-title">Datatables</h5>
 
-
-                        <a href="agregar_alumno.php" class="btn btn-primary">Agregar</a>
-
-                        <br>
-                        <br>
-                        <input type="text" id="search" placeholder="Buscar por nombre">
-                        <button id="searchBtn" type="button">Buscar</button>
-
-                        <script>
-                            $(document).ready(function() {
-                                $('#searchBtn').on('click', function() {
-                                    var query = $('#search').val();
-                                    searchUsers(query);
-                                });
-
-                                function searchUsers(query) {
-                                    $.ajax({
-                                        url: 'buscar_usuarios.php',
-                                        method: 'POST',
-                                        data: {
-                                            query: query
-                                        },
-                                        success: function(response) {
-                                            $('.datatable-table tbody').html(response);
-                                        }
-                                    });
-                                }
-                            });
-                        </script>
-
                         <!-- Table with stripped rows -->
                         <div class="datatable-wrapper datatable-loading no-footer sortable searchable fixed-columns">
                             <div class="datatable-container">
-                                <table class="table datatable datatable-table">
-                                    <thead>
-                                        <tr>
-                                            <th data-sortable="true"><a href="#">ID</a></th>
-                                            <th data-sortable="true"><a href="#">Nombres</a></th>
-                                            <th data-sortable="true"><a href="#">Apellidos</a></th>
-                                            <th data-sortable="true"><a href="#">Correo</a></th>
-                                            <th data-sortable="true"><a href="#">Semestre</a></th>
-                                            <th data-sortable="true"><a href="#">Carrera</a></th>
-                                            <th data-sortable="true"><a href="#">Puntos</a></th>
-                                            <th>&nbsp;</th>
-                                            <th>&nbsp;</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php
+                                <?php
+                                // Obtener el id del responsable que ha iniciado sesión (en este caso, 12)
+                                $id_responsable = $id_admin;
 
-                                        $sql = "SELECT * FROM alumnos";
-                                        $resultado = mysqli_query($conn, $sql);
-                                        if (!$resultado) {
-                                            die("Error al obtener los datos: " . mysqli_error($conn));
-                                        }
-
-                                        foreach ($resultado as $fila) {
-                                            echo "<tr>";
-                                            echo "<td>" . $fila['id'] . "</td>";
-                                            echo "<td>" . $fila['nombres'] . "</td>";
-                                            echo "<td>" . $fila['apellidos'] . "</td>";
-                                            echo "<td>" . $fila['correo'] . "</td>";
-                                            echo "<td>" . $fila['semestre'] . "</td>";
-                                            echo "<td>" . $fila['carrera'] . "</td>";
-                                            echo "<td>" . $fila['puntos'] . "</td>";
-                                            echo '<td> <a href= "editar_alumnos.php?ideditar=' . $fila['id'] . ' " class="btn btn-warning ri-edit-box-fill"> </td>';
-                                            echo '<td> <a href= "eliminar_alumnos.php?ideliminar=' . $fila['id'] . ' " class="btn btn-danger ri-delete-bin-6-line"> </td>';
-
-                                            echo "</tr>";
-                                        }
+                                // Consulta para obtener los alumnos inscritos en la actividad del responsable
+                                $sql = "SELECT alumnos.id, alumnos.nombres, alumnos.apellidos, alumnos.correo,alumnos.semestre,alumnos.carrera
+        FROM alumnos
+        INNER JOIN registroactividades ON alumnos.id = registroactividades.id_alumno
+        WHERE registroactividades.id_responsable = $id_responsable";
 
 
+                                $result = $conn->query($sql);
 
-                                        ?>
+                                if (!$result) {
+                                    die("Error en la consulta: " . mysqli_error($conn));
+                                }
+
+                                if ($result->num_rows > 0) {
+                                    echo '<table class="table datatable datatable-table">';
+                                    echo '<thead>';
+                                    echo '<tr>';
+                                    echo '<th data-sortable="true"><a href="#">Nombre</a></th>';
+                                    echo '<th data-sortable="true"><a href="#">Apellidos</a></th>';
+                                    echo '<th data-sortable="true"><a href="#">Correo</a></th>';
+                                    echo '<th data-sortable="true"><a href="#">Semestre</a></th>';
+                                    echo '<th data-sortable="true"><a href="#">Carrera</a></th>';
+                                    echo '<th>&nbsp;</th>';
+                                    echo '</tr>';
+                                    echo '</thead>';
+                                    echo '<tbody>';
+
+                                    // Mostrar los datos de los alumnos
+                                    while ($row = $result->fetch_assoc()) {
+                                        echo '<tr>';
+                                        echo '<td>' . $row["nombres"] . '</td>';
+                                        echo '<td>' . $row["apellidos"] . '</td>';
+                                        echo '<td>' . $row["correo"] . '</td>';
+                                        echo '<td>' . $row["semestre"] . '</td>';
+                                        echo '<td>' . $row["carrera"] . '</td>';
+                                        echo '<td><div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" name="verificado" id="flexSwitchCheckChecked" checked="">
+                                        <label class="form-check-label" for="flexSwitchCheckChecked"></label>
+                                      </div></td>';
+                                        echo '</tr>';
+                                    }
+
+                                    echo '</tbody>';
+                                    echo '</table>';
+                                } else {
+                                    echo "No hay alumnos inscritos en la actividad del responsable.";
+                                }
+
+                                // Cerrar la conexión
+                                $conn->close();
+                                ?>
 
 
-
-
-                                    </tbody>
-                                </table>
                             </div>
                             <div class="datatable-bottom">
+                                <input type="submit" value="Enviar" class="btn btn-success">
                                 <div class="datatable-info">Showing 1 to 5 of 5 entries</div>
                                 <nav class="datatable-pagination">
                                     <ul class="datatable-pagination-list"></ul>

@@ -183,12 +183,26 @@ if (!isset($_SESSION['admin_name'])) {
                 </a>
             </li><!-- End Dashboard Nav -->
 
+
             <li class="nav-item">
-                <a class="nav-link " href="admin/actividades.php">
-                    <i class="bi bi-grid"></i>
+                <a class="nav-link collapsed" href="actividades.php">
+                    <i class="bi bi-person"></i>
                     <span>Actividades</span>
                 </a>
-            </li><!-- End Dashboard Nav -->
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="alumnos.php">
+                    <i class="bi bi-person"></i>
+                    <span>Alumnos</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="responsables.php">
+                    <i class="bi bi-person"></i>
+                    <span>Responsables</span>
+                </a>
+            </li>
         </ul>
 
 

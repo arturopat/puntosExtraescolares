@@ -231,6 +231,17 @@ if (!isset($_SESSION['nombre_usuario'])) {
         INNER JOIN registroactividades ON alumnos.id = registroactividades.id_alumno
         WHERE registroactividades.id_responsable = $id_responsable";
 
+                                $sql2 = "SELECT actividades.puntos
+        FROM actividades
+        INNER JOIN registroactividades ON actividades.id_actividad = registroactividades.id_actividad
+        WHERE registroactividades.id_responsable = $id_responsable";
+
+                                $result2 = $conn->query($sql2);
+
+                                // obtencion de los puntos dependiendo de l actividad, falta verificar el checkbox "ON" y en caso de que si actualizar los puntos dependiendo de la actividad y los puntos
+                                $result2 = $conn->query($sql2);
+
+
 
                                 $result = $conn->query($sql);
 
@@ -239,21 +250,27 @@ if (!isset($_SESSION['nombre_usuario'])) {
                                 }
 
                                 if ($result->num_rows > 0) {
+                                    echo '<form method="POST" action="actualizar_puntos.php">';
                                     echo '<table class="table datatable datatable-table">';
                                     echo '<thead>';
                                     echo '<tr>';
+                                    echo '<th></th>'; // Agregamos una columna vacía para el checkbox
                                     echo '<th data-sortable="true"><a href="#">Nombre</a></th>';
                                     echo '<th data-sortable="true"><a href="#">Apellidos</a></th>';
                                     echo '<th data-sortable="true"><a href="#">Correo</a></th>';
                                     echo '<th data-sortable="true"><a href="#">Semestre</a></th>';
                                     echo '<th data-sortable="true"><a href="#">Carrera</a></th>';
+                                    echo '<th></th>';
                                     echo '</tr>';
                                     echo '</thead>';
                                     echo '<tbody>';
 
+
                                     // Mostrar los datos de los alumnos
                                     while ($row = $result->fetch_assoc()) {
                                         echo '<tr>';
+
+                                        echo '<td><input type="checkbox" name="alumnos[]" value="' . $row["id"] . '"></td>'; // Agregamos un checkbox por cada alumno
                                         echo '<td>' . $row["nombres"] . '</td>';
                                         echo '<td>' . $row["apellidos"] . '</td>';
                                         echo '<td>' . $row["correo"] . '</td>';
@@ -264,12 +281,49 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
                                     echo '</tbody>';
                                     echo '</table>';
+
+                                    echo '<button type="submit" class="btn btn-primary">Actualizar Puntos</button>';
+                                    echo '</form>';
                                 } else {
                                     echo "No hay alumnos inscritos en la actividad del responsable.";
                                 }
 
+
+
+                                if ($result2->num_rows > 0) {
+                                    echo '<form method="POST" action="actualizar_puntos.php">';
+                                    echo '<table class="table datatable datatable-table">';
+                                    echo '<thead>';
+                                    echo '<tr>';
+                                    echo '<th></th>'; // Agregamos una columna vacía para el checkbox
+                                    echo '<th data-sortable="true"><a href="#">puntos</a></th>';
+                                    echo '<th></th>';
+                                    echo '</tr>';
+                                    echo '</thead>';
+                                    echo '<tbody>';
+
+
+                                    // Mostrar los datos de los alumnos
+                                    while ($row2 = $result2->fetch_assoc()) {
+                                        echo '<tr>';
+
+                                        echo '<td>' . $row2["puntos"] . '</td>';
+
+                                        echo '</tr>';
+                                    }
+
+                                    echo '</tbody>';
+                                    echo '</table>';
+
+                                    echo '<button type="submit" class="btn btn-primary">Actualizar Puntos</button>';
+                                    echo '</form>';
+                                } else {
+                                    echo "No hay alumnos inscritos en la actividad del responsable.";
+                                }
+
+
+
                                 // Cerrar la conexión
-                                $conn->close();
                                 ?>
 
 
