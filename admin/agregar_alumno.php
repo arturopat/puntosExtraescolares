@@ -232,11 +232,7 @@ if (!isset($_SESSION['admin_name'])) {
                             <h5 class="card-title">General Form Elements</h5>
 
                             <?php
-
-
                             if ($_POST) {
-
-
                                 $nombres = mysqli_real_escape_string($conn, $_POST['nombres']);
                                 $apellidos = mysqli_real_escape_string($conn, $_POST['apellidos']);
                                 $correo = mysqli_real_escape_string($conn, $_POST['correo']);
@@ -246,32 +242,61 @@ if (!isset($_SESSION['admin_name'])) {
                                 $cpass = md5($_POST['cpassword']);
                                 $puntos = mysqli_real_escape_string($conn, $_POST['puntos']);
 
-
-                                $select = " SELECT * FROM alumnos WHERE correo = '$correo' && contrasena = '$pass' ";
-
+                                $select = "SELECT * FROM alumnos WHERE correo = '$correo' && contrasena = '$pass'";
                                 $result = mysqli_query($conn, $select);
 
                                 if (mysqli_num_rows($result) > 0) {
-
-                                    $error[] = 'user already exist!';
+                                    $error[] = 'El usuario ya existe.';
                                 } else {
-
                                     if ($pass != $cpass) {
-                                        $error[] = 'password not matched!';
+                                        $error[] = 'Las contraseñas no coinciden.';
                                     } else {
-                                        $insert = "INSERT INTO alumnos(nombres, apellidos, correo, semestre,carrera,contrasena,puntos) VALUES('$nombres','$apellidos','$correo','$semestre','$carrera','$pass','$puntos')";
-                                        mysqli_query($conn, $insert);
-                                        echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/alumnos.php';</script>";
+                                        // Procesar la imagen de perfil
+                                        if (isset($_FILES['imgperfil']) && $_FILES['imgperfil']['error'] === UPLOAD_ERR_OK) {
+                                            $file = $_FILES['imgperfil'];
+                                            $fileName = $file['name'];
+                                            $fileTmpName = $file['tmp_name'];
+
+                                            // Obtener la extensión del archivo
+                                            $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
+                                            $allowedExtensions = ['jpg', 'jpeg', 'png']; // Extensiones permitidas
+
+                                            if (in_array($fileExtension, $allowedExtensions)) {
+                                                // Ruta de la carpeta donde se almacenarán las imágenes de perfil
+                                                $uploadDirectory = 'imgperfila/';
+
+                                                // Generar un nombre único para la imagen
+                                                $uniqueFileName = uniqid('profile_', true) . '.' . $fileExtension;
+                                                $destination = $uploadDirectory . $uniqueFileName;
+
+                                                // Mover la imagen a la carpeta de destino
+                                                if (move_uploaded_file($fileTmpName, $destination)) {
+                                                    // La imagen se ha movido exitosamente
+                                                    // Guardar el nombre del archivo en la base de datos
+                                                    $insert = "INSERT INTO alumnos (nombres, apellidos, correo, semestre, carrera, contrasena, puntos, imgperfil)
+                                   VALUES ('$nombres', '$apellidos', '$correo', '$semestre', '$carrera', '$pass', '$puntos', '$uniqueFileName')";
+                                                    mysqli_query($conn, $insert);
+                                                    echo "<script>window.location.href = 'http://localhost/proyectos-php/puntosExtraescolares/admin/alumnos.php';</script>";
+                                                } else {
+                                                    // Hubo un error al mover la imagen
+                                                    $error[] = 'Error al subir la imagen de perfil.';
+                                                }
+                                            } else {
+                                                // La extensión del archivo no es válida
+                                                $error[] = 'La imagen de perfil debe ser en formato JPG, JPEG o PNG.';
+                                            }
+                                        } else {
+                                            // No se seleccionó una imagen de perfil
+                                            $error[] = 'Debes seleccionar una imagen de perfil.';
+                                        }
                                     }
                                 }
                             }
-
-
-
                             ?>
 
+
                             <!-- General Form Elements -->
-                            <form method="post" id="myForm">
+                            <form method="post" id="myForm" enctype="multipart/form-data">
                                 <div class="row mb-3">
                                     <label for="inputText" class="col-sm-2 col-form-label">Nombres</label>
                                     <div class="col-sm-10">
@@ -318,6 +343,13 @@ if (!isset($_SESSION['admin_name'])) {
                                     <label for="inputText" class="col-sm-2 col-form-label">Puntos</label>
                                     <div class="col-sm-10">
                                         <input type="text" name="puntos" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <label for="inputText" class="col-sm-2 col-form-label">Img. Perfil</label>
+                                    <div class="col-sm-10">
+                                        <input type="file" name="imgperfil" class="form-control">
                                     </div>
                                 </div>
 

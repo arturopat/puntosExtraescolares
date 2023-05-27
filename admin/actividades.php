@@ -57,13 +57,14 @@ if (!isset($_SESSION['admin_name'])) {
 <body>
 
 
+
     <?php
     @include '../config.php';
 
     $id_admin = $_SESSION['id_admin'];
 
     // Consulta SQL para obtener los datos del usuario
-    $sql = "SELECT id, nombre, correo, tipo_usuario FROM adminsresponsables WHERE id = ?";
+    $sql = "SELECT id, nombre, correo, tipo_usuario,imgperfil FROM adminsresponsables WHERE id = ?";
 
     // Preparar la consulta
     $stmt = $conn->prepare($sql);
@@ -75,7 +76,7 @@ if (!isset($_SESSION['admin_name'])) {
     $stmt->execute();
 
     // Vincular los resultados a variables
-    $stmt->bind_result($id, $nombre, $correo, $tipo_usuario);
+    $stmt->bind_result($id, $nombre, $correo, $tipo_usuario, $imgperfil);
 
     // Obtener datos del usuario
 
@@ -84,6 +85,7 @@ if (!isset($_SESSION['admin_name'])) {
         $nombre;
         $correo;
         $tipo_usuario;
+        $imgperfil;
     } else {
         echo "No se encontraron datos del usuario";
     }
@@ -91,10 +93,11 @@ if (!isset($_SESSION['admin_name'])) {
     // Cerrar la consulta
     $stmt->close();
 
+
     // Cerrar conexión
 
-    ?>
 
+    ?>
 
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center ">
@@ -121,7 +124,7 @@ if (!isset($_SESSION['admin_name'])) {
                 <li class="nav-item dropdown pe-3">
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                        <img src="../assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+                        <img src="imgperfila/<?php echo $imgperfil; ?>" alt="Profile" class="rounded-circle">
                         <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $nombre; ?></span>
                     </a><!-- End Profile Iamge Icon -->
 

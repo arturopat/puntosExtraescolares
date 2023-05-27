@@ -63,7 +63,7 @@ if (!isset($_SESSION['nombre_alumno'])) {
     $id_alumno = $_SESSION['id_alumno'];
 
     // Consulta SQL para obtener los datos del usuario
-    $sql = "SELECT id, nombres,apellidos, correo, semestre,carrera,puntos FROM alumnos WHERE id = ?";
+    $sql = "SELECT id, nombres,apellidos, correo, semestre,carrera,puntos,imgperfil FROM alumnos WHERE id = ?";
 
     // Preparar la consulta
     $stmt = $conn->prepare($sql);
@@ -75,7 +75,7 @@ if (!isset($_SESSION['nombre_alumno'])) {
     $stmt->execute();
 
     // Vincular los resultados a variables
-    $stmt->bind_result($id, $nombres, $apellidos, $correo, $semestre, $carrera, $puntos);
+    $stmt->bind_result($id, $nombres, $apellidos, $correo, $semestre, $carrera, $puntos, $imgperfil);
 
     // Obtener datos del usuario
 
@@ -87,6 +87,7 @@ if (!isset($_SESSION['nombre_alumno'])) {
         $semestre;
         $carrera;
         $puntos;
+        $imgperfil;
     } else {
         echo "No se encontraron datos del usuario";
     }
@@ -122,7 +123,7 @@ if (!isset($_SESSION['nombre_alumno'])) {
                 <li class="nav-item dropdown pe-3">
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                        <img src="../assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+                        <img src="../admin/imgperfila/<?php echo $imgperfil; ?>" alt="Profile" class="rounded-circle">
                         <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $nombres; ?></span>
                     </a><!-- End Profile Iamge Icon -->
 
