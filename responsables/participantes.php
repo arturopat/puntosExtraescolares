@@ -311,7 +311,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
                                         }
 
                                         echo '></td>'; // Agregamos el [] al nombre del checkbox para que sea un array
-                                        echo '<input name="puntos" value="' . $puntos2 . '" >';
+                                        echo '<input  type="hidden" name="puntos" value="' . $puntos2 . '" >';
                                         echo '<td>' . $row["nombres"] . '</td>';
                                         echo '<td>' . $row["apellidos"] . '</td>';
                                         echo '<td>' . $row["correo"] . '</td>';
