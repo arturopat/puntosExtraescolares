@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jun 08, 2023 at 06:20 AM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.0.28
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 08-06-2023 a las 18:08:23
+-- Versión del servidor: 10.4.28-MariaDB
+-- Versión de PHP: 8.0.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `proyecto`
+-- Base de datos: `proyecto`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `actividades`
+-- Estructura de tabla para la tabla `actividades`
 --
 
 CREATE TABLE `actividades` (
@@ -40,7 +40,7 @@ CREATE TABLE `actividades` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `actividades`
+-- Volcado de datos para la tabla `actividades`
 --
 
 INSERT INTO `actividades` (`id_actividad`, `nombre_actividad`, `fecha_inicio`, `fecha_finalizacion`, `horario`, `puntos`, `cupo_disponible`, `id_responsable`, `url`) VALUES
@@ -50,7 +50,7 @@ INSERT INTO `actividades` (`id_actividad`, `nombre_actividad`, `fecha_inicio`, `
 -- --------------------------------------------------------
 
 --
--- Table structure for table `adminsresponsables`
+-- Estructura de tabla para la tabla `adminsresponsables`
 --
 
 CREATE TABLE `adminsresponsables` (
@@ -63,19 +63,20 @@ CREATE TABLE `adminsresponsables` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `adminsresponsables`
+-- Volcado de datos para la tabla `adminsresponsables`
 --
 
 INSERT INTO `adminsresponsables` (`id`, `nombre`, `correo`, `contrasena`, `tipo_usuario`, `imgperfil`) VALUES
 (1, 'admin', 'admin@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'admin', 'Captura de pantalla 2023-04-26 182327.png'),
-(5, 'responsable2', 'responsable2@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'respon', ''),
-(6, 'responsable', 'responsable@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'respon', ''),
-(7, 'responsable3', 'responsable3@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'respon', '');
+(5, 'responsable2', 'responsable2@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'respon', 'Captura de pantalla 2023-04-26 163038.png'),
+(6, 'responsable', 'responsable@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'respon', 'Captura de pantalla 2023-06-08 095606.png'),
+(7, 'responsable3', 'responsable3@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'respon', 'Captura de pantalla 2023-04-26 183852.png'),
+(8, 'responsable', 'responsable4@gmail.com', '81dc9bdb52d04dc20036dbd8313ed055', 'respon', '');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `alumnos`
+-- Estructura de tabla para la tabla `alumnos`
 --
 
 CREATE TABLE `alumnos` (
@@ -91,7 +92,7 @@ CREATE TABLE `alumnos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `alumnos`
+-- Volcado de datos para la tabla `alumnos`
 --
 
 INSERT INTO `alumnos` (`id`, `nombres`, `apellidos`, `correo`, `semestre`, `carrera`, `contrasena`, `puntos`, `imgperfil`) VALUES
@@ -102,7 +103,7 @@ INSERT INTO `alumnos` (`id`, `nombres`, `apellidos`, `correo`, `semestre`, `carr
 -- --------------------------------------------------------
 
 --
--- Table structure for table `evidencia`
+-- Estructura de tabla para la tabla `evidencia`
 --
 
 CREATE TABLE `evidencia` (
@@ -113,7 +114,7 @@ CREATE TABLE `evidencia` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `evidencia`
+-- Volcado de datos para la tabla `evidencia`
 --
 
 INSERT INTO `evidencia` (`id`, `evidenciaimg`, `id_responsable`, `fecha_subida`) VALUES
@@ -122,7 +123,7 @@ INSERT INTO `evidencia` (`id`, `evidenciaimg`, `id_responsable`, `fecha_subida`)
 -- --------------------------------------------------------
 
 --
--- Table structure for table `registroactividades`
+-- Estructura de tabla para la tabla `registroactividades`
 --
 
 CREATE TABLE `registroactividades` (
@@ -134,7 +135,7 @@ CREATE TABLE `registroactividades` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `registroactividades`
+-- Volcado de datos para la tabla `registroactividades`
 --
 
 INSERT INTO `registroactividades` (`id`, `id_actividad`, `id_alumno`, `id_responsable`, `fecha_registro`) VALUES
@@ -142,36 +143,36 @@ INSERT INTO `registroactividades` (`id`, `id_actividad`, `id_alumno`, `id_respon
 (10, 5, 11, 6, '2023-06-08');
 
 --
--- Indexes for dumped tables
+-- Índices para tablas volcadas
 --
 
 --
--- Indexes for table `actividades`
+-- Indices de la tabla `actividades`
 --
 ALTER TABLE `actividades`
   ADD PRIMARY KEY (`id_actividad`),
   ADD KEY `id_responsable` (`id_responsable`);
 
 --
--- Indexes for table `adminsresponsables`
+-- Indices de la tabla `adminsresponsables`
 --
 ALTER TABLE `adminsresponsables`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `alumnos`
+-- Indices de la tabla `alumnos`
 --
 ALTER TABLE `alumnos`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `evidencia`
+-- Indices de la tabla `evidencia`
 --
 ALTER TABLE `evidencia`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `registroactividades`
+-- Indices de la tabla `registroactividades`
 --
 ALTER TABLE `registroactividades`
   ADD PRIMARY KEY (`id`),
@@ -180,51 +181,51 @@ ALTER TABLE `registroactividades`
   ADD KEY `id_responsable` (`id_responsable`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT de las tablas volcadas
 --
 
 --
--- AUTO_INCREMENT for table `actividades`
+-- AUTO_INCREMENT de la tabla `actividades`
 --
 ALTER TABLE `actividades`
   MODIFY `id_actividad` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `adminsresponsables`
+-- AUTO_INCREMENT de la tabla `adminsresponsables`
 --
 ALTER TABLE `adminsresponsables`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT for table `alumnos`
+-- AUTO_INCREMENT de la tabla `alumnos`
 --
 ALTER TABLE `alumnos`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
--- AUTO_INCREMENT for table `evidencia`
+-- AUTO_INCREMENT de la tabla `evidencia`
 --
 ALTER TABLE `evidencia`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT for table `registroactividades`
+-- AUTO_INCREMENT de la tabla `registroactividades`
 --
 ALTER TABLE `registroactividades`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
--- Constraints for dumped tables
+-- Restricciones para tablas volcadas
 --
 
 --
--- Constraints for table `actividades`
+-- Filtros para la tabla `actividades`
 --
 ALTER TABLE `actividades`
   ADD CONSTRAINT `actividades_ibfk_1` FOREIGN KEY (`id_responsable`) REFERENCES `adminsresponsables` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `registroactividades`
+-- Filtros para la tabla `registroactividades`
 --
 ALTER TABLE `registroactividades`
   ADD CONSTRAINT `registroactividades_ibfk_1` FOREIGN KEY (`id_actividad`) REFERENCES `actividades` (`id_actividad`) ON DELETE CASCADE,

@@ -1,5 +1,4 @@
 <?php
-
 @include '../config.php';
 
 session_start();
@@ -9,7 +8,87 @@ if (!isset($_SESSION['nombre_usuario'])) {
 }
 
 
+// Obtener datos del usuario
+$id_responsable = $_SESSION['id_usuario'];
+
+// Consulta SQL para obtener los datos del usuario
+$sql = "SELECT id, nombre, correo, tipo_usuario, imgperfil FROM adminsresponsables WHERE id = ?";
+
+// Preparar la consulta
+$stmt = $conn->prepare($sql);
+
+// Vincular el ID de administrador a la consulta
+$stmt->bind_param("i", $id_responsable);
+
+// Ejecutar la consulta
+$stmt->execute();
+
+// Vincular los resultados a variables
+$stmt->bind_result($id, $nombre, $correo, $tipo_usuario, $imgperfil);
+
+// Obtener datos del usuario
+if ($stmt->fetch()) {
+    $id;
+    $nombre;
+    $correo;
+    $tipo_usuario;
+    $imgperfil;
+} else {
+    echo "No se encontraron datos del usuario";
+}
+
+// Cerrar la consulta
+$stmt->close();
+
+// Cerrar conexión
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $id_responsable = $_SESSION['id_usuario'];
+    $nombre = $_POST['nombretxt'];
+    $correo = $_POST['correotxt'];
+
+    // Verificar si se cargó una nueva imagen
+    if (!empty($_FILES['actualizarimg']['tmp_name'])) {
+        // Eliminar la imagen anterior
+        unlink('../responsables/imgresponsable/' . $imgperfil);
+
+        // Procesar la nueva imagen y guardarla en el directorio
+        $imgperfil = $_FILES['actualizarimg']['name'];
+        $imgperfil_temp = $_FILES['actualizarimg']['tmp_name'];
+        move_uploaded_file($imgperfil_temp, '../responsables/imgresponsable/' . $imgperfil);
+    }
+
+    // Realizar el update
+    $sql = "UPDATE adminsresponsables SET nombre=?, correo=?, imgperfil=? WHERE id=?";
+
+    // Preparar la consulta
+    $stmt = $conn->prepare($sql);
+
+    // Vincular los parámetros de la consulta
+    $stmt->bind_param("sssi", $nombre, $correo, $imgperfil, $id_responsable);
+
+    // Ejecutar la consulta
+    if ($stmt->execute()) {
+        echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
+                <i class='bi bi-check-circle me-1'></i>
+                Se actualizó correctamente la información.
+                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+              </div>";
+    } else {
+        echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                <i class='bi bi-exclamation-octagon me-1'></i>
+                Hubo un error al actualizar la información: " . $stmt->error . "
+                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+              </div>";
+    }
+
+    // Cerrar la consulta
+    $stmt->close();
+}
+
 ?>
+
 
 
 <!DOCTYPE html>
@@ -54,43 +133,6 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
 <body>
 
-    <?php
-    @include '../config.php';
-
-    $id_responsable = $_SESSION['id_usuario'];
-
-    // Consulta SQL para obtener los datos del usuario
-    $sql = "SELECT id, nombre, correo, tipo_usuario FROM adminsresponsables WHERE id = ?";
-
-    // Preparar la consulta
-    $stmt = $conn->prepare($sql);
-
-    // Vincular el ID de administrador a la consulta
-    $stmt->bind_param("i", $id_responsable);
-
-    // Ejecutar la consulta
-    $stmt->execute();
-
-    // Vincular los resultados a variables
-    $stmt->bind_result($id, $nombre, $correo, $tipo_usuario);
-
-    // Obtener datos del usuario
-
-    if ($stmt->fetch()) {
-        $id;
-        $nombre;
-        $correo;
-        $tipo_usuario;
-    } else {
-        echo "No se encontraron datos del usuario";
-    }
-
-    // Cerrar la consulta
-    $stmt->close();
-
-    // Cerrar conexión
-
-    ?>
     <!-- ======= Header ======= -->
     <header id="header" class="header fixed-top d-flex align-items-center">
 
@@ -118,7 +160,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
                 <li class="nav-item dropdown pe-3">
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
-                        <img src="../assets/img/profile-img.jpg" alt="Profile" class="rounded-circle">
+                        <img src="imgresponsable/<?php echo $imgperfil; ?>" alt="Profile" class="rounded-circle">
                         <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $nombre; ?></span>
                     </a><!-- End Profile Iamge Icon -->
 
@@ -186,33 +228,6 @@ if (!isset($_SESSION['nombre_usuario'])) {
             </nav>
         </div><!-- End Page Title -->
 
-        <?php
-        include '../config.php';
-
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $nombre = $_POST['nombretxt'];
-            $correo = $_POST['correotxt'];
-
-            // Realizar el update
-            $sql = "UPDATE adminsresponsables SET nombre='$nombre',correo='$correo' WHERE id=$id";
-
-            if ($conn->query($sql) === TRUE) {
-                echo "<div class='alert alert-success alert-dismissible fade show' role='alert'>
-                            <i class='bi bi-check-circle me-1'></i>
-                            Se actualizo correctamente la informacion
-                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                          </div>";
-            } else {
-                echo "<div class='alert alert-danger alert-dismissible fade show' role='alert'>
-                <i class='bi bi-exclamation-octagon me-1'></i>
-                A simple danger alert with icon—check it out!
-                <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-              </div> " . $conn->error;
-            }
-
-            $conn->close();
-        }
-        ?>
 
         <section class="section profile">
             <div class="row">
@@ -284,15 +299,14 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
 
                                     <!-- Profile Edit Form -->
-                                    <form method="post">
+                                    <form method="post" enctype="multipart/form-data">
                                         <div class="row mb-3">
                                             <label for="profileImage" class="col-md-4 col-lg-3 col-form-label">Profile Image</label>
                                             <div class="col-md-8 col-lg-9">
-                                                <img src="../assets/img/profile-img.jpg" alt="Profile">
-                                                <div class="pt-2">
-                                                    <a href="#" class="btn btn-primary btn-sm" title="Upload new profile image"><i class="bi bi-upload"></i></a>
-                                                    <a href="#" class="btn btn-danger btn-sm" title="Remove my profile image"><i class="bi bi-trash"></i></a>
-                                                </div>
+                                                <img id="previewImage" src="imgpresponsable/<?php echo $imgperfil; ?>" alt="Profile" class="rounded-circle">
+                                                <br>
+                                                <br>
+                                                <input class="form-control" type="file" name="actualizarimg" onchange="previewFile()">
                                             </div>
                                         </div>
 
@@ -320,7 +334,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
                                         <div class="text-center">
                                             <button type="submit" class="btn btn-primary">Guardar cambios</button>
                                         </div>
-                                    </form><!-- End Profile Edit Form -->
+                                    </form>
 
                                 </div>
 
@@ -408,6 +422,25 @@ if (!isset($_SESSION['nombre_usuario'])) {
         </section>
 
     </main><!-- End #main -->
+
+
+    <script>
+        function previewFile() {
+            var preview = document.querySelector('#previewImage');
+            var file = document.querySelector('input[type=file]').files[0];
+            var reader = new FileReader();
+
+            reader.onloadend = function() {
+                preview.src = reader.result;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "";
+            }
+        }
+    </script>
 
     <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
