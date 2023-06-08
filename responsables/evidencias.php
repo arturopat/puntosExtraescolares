@@ -1,17 +1,59 @@
 <?php
-
 @include '../config.php';
 
 session_start();
 
 if (!isset($_SESSION['nombre_usuario'])) {
-    header('location:../login_form.php');
+    header('location: ../login_form.php');
+    exit;
 }
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $listaimg = $_FILES['listaimg'];
+    $idresponsable = $_POST['idresponsable'];
+    $fechasubida = $_POST['fechasubida'];
 
+    // Verificar si se ha seleccionado un archivo
+    if ($listaimg['name'] !== '') {
+        // Obtener la información del archivo
+        $nombreArchivo = $listaimg['name'];
+        $nombreArchivoTmp = $listaimg['tmp_name'];
+        $nombreArchivoDestino = 'evidencias/' . $nombreArchivo;
+
+        // Mover el archivo a la carpeta de evidencias
+        if (move_uploaded_file($nombreArchivoTmp, $nombreArchivoDestino)) {
+            // Archivo movido con éxito, ahora insertar información en la base de datos
+
+            // Consulta SQL para insertar los datos
+            $sql = "INSERT INTO evidencia (evidenciaimg, id_responsable, fecha_subida) VALUES (?, ?, ?)";
+
+            // Preparar la consulta
+            $stmt = $conn->prepare($sql);
+
+            // Vincular los parámetros de la consulta
+            $stmt->bind_param("sss", $nombreArchivoDestino, $idresponsable, $fechasubida);
+
+            // Ejecutar la consulta
+            if ($stmt->execute()) {
+                // Éxito al insertar los datos
+                echo "La información se ha agregado correctamente.";
+            } else {
+                // Error al ejecutar la consulta
+                echo "Ocurrió un error al agregar la información en la base de datos.";
+            }
+
+            // Cerrar la consulta
+            $stmt->close();
+        } else {
+            // Error al mover el archivo
+            echo "Ocurrió un error al subir el archivo.";
+        }
+    } else {
+        // No se ha seleccionado ningún archivo
+        echo "Debe seleccionar un archivo.";
+    }
+}
 ?>
-
-
 
 
 <!DOCTYPE html>
@@ -60,7 +102,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
     <?php
     @include '../config.php';
 
-    $id_responsable = $_SESSION['id_usuario'];
+    $id_admin = $_SESSION['id_usuario'];
 
     // Consulta SQL para obtener los datos del usuario
     $sql = "SELECT id, nombre, correo, tipo_usuario FROM adminsresponsables WHERE id = ?";
@@ -69,7 +111,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
     $stmt = $conn->prepare($sql);
 
     // Vincular el ID de administrador a la consulta
-    $stmt->bind_param("i", $id_responsable);
+    $stmt->bind_param("i", $id_admin);
 
     // Ejecutar la consulta
     $stmt->execute();
@@ -94,8 +136,10 @@ if (!isset($_SESSION['nombre_usuario'])) {
     // Cerrar conexión
 
     ?>
+
+
     <!-- ======= Header ======= -->
-    <header id="header" class="header fixed-top d-flex align-items-center">
+    <header id="header" class="header fixed-top d-flex align-items-center ">
 
         <div class="d-flex align-items-center justify-content-between">
             <a href="index.html" class="logo d-flex align-items-center">
@@ -125,10 +169,8 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
                         <li class="dropdown-header">
-
                             <h6><?php echo $nombre; ?></h6>
-
-                            <span>Solo soy un alumno</span>
+                            <span>Solo soy un admin</span>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
@@ -197,6 +239,7 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
 
 
+
         </ul>
 
 
@@ -207,7 +250,6 @@ if (!isset($_SESSION['nombre_usuario'])) {
 
         <div class="pagetitle">
             <h1>Dashboard</h1>
-
             <nav>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="login_form.php">Home</a></li>
@@ -216,64 +258,102 @@ if (!isset($_SESSION['nombre_usuario'])) {
             </nav>
         </div><!-- End Page Title -->
 
+
+
+
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">subir evidencia</h5>
+
+                        <!-- Table with stripped rows -->
+                        <div class="datatable-wrapper datatable-loading no-footer sortable searchable fixed-columns">
+                            <div class="datatable-container">
+
+                                <br>
+                                <!-- Horizontal Form -->
+                                <form method="post" enctype="multipart/form-data">
+                                    <div class="row mb-3">
+                                        <label for="inputEmail3" class="col-sm-2 col-form-label">Lista</label>
+                                        <div class="col-sm-10">
+                                            <input name="listaimg" type="file" class="form-control" id="inputText">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="inputEmail3" class="col-sm-2 col-form-label">ID responsable</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" name="idresponsable" class="form-control" id="inputEmail" value="<?php echo $id; ?>">
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <label for="inputPassword3" class="col-sm-2 col-form-label">Fecha Subida</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" value="<?php echo date('Y-m-d'); ?>" name="fechasubida" class="form-control" id="inputPassword">
+                                        </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary">
+                                            Enviar
+                                        </button>
+                                        <button type="reset" class="btn btn-secondary">
+                                            Reset
+                                        </button>
+                                    </div>
+                                </form>
+                                <!-- End Horizontal Form -->
+
+                            </div>
+                            <div class="datatable-bottom">
+                                <nav class="datatable-pagination">
+                                    <ul class="datatable-pagination-list"></ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <!-- End Table with stripped rows -->
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <section class="section dashboard">
 
 
-            <?php
-            $sql_responsables = "SELECT * FROM actividades";
-            $result_responsables = $conn->query($sql_responsables);
-            echo "<div class='row'>";
-            foreach ($result_responsables as $resultado) {
-                echo "<div class='col-md-6'>";
-                echo "  <div class='card mb-3'>";
-                echo "    <div class='row g-0'>";
-                echo "      <div class='col-6'>";
-                echo "        <img src='" . $resultado['url'] . "' class='card-img' alt='...' style='width: 300px; height: 230px; object-fit: cover;'>";
-                echo "      </div>";
-                echo "      <div class='col-6'>";
-                echo "        <div class='card-body'>";
-                echo "          <h5 class='card-title'>" . $resultado['nombre_actividad'] . "</h5>";
-                echo "          <p class='card-text'><b>Inicia: </b>" . $resultado['fecha_inicio'] . "</p>";
-                echo "          <p class='card-text'><b>Hora: </b>" . $resultado['horario'] . "</p>";
-                echo "          <p class='card-text'><b>Puntos: </b>" . $resultado['puntos'] . "</p>";
-                echo "        </div>";
-                echo "      </div>";
-                echo "    </div>";
-                echo "  </div>";
-                echo "</div>";
-            }
-            echo "</div>";
-            ?>
+        </section>
 
+    </main><!-- End #main -->
 
-            <!-- ======= Footer ======= -->
-            <footer id="footer" class="footer">
-                <div class="copyright">
-                    &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
-                </div>
-                <div class="credits">
-                    <!-- All the links in the footer should remain intact. -->
-                    <!-- You can delete the links only if you purchased the pro version. -->
-                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                    <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
-                    Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
-                </div>
-            </footer><!-- End Footer -->
+    <!-- ======= Footer ======= -->
+    <footer id="footer" class="footer">
+        <div class="copyright">
+            &copy; Copyright <strong><span>NiceAdmin</span></strong>. All Rights Reserved
+        </div>
+        <div class="credits">
+            <!-- All the links in the footer should remain intact. -->
+            <!-- You can delete the links only if you purchased the pro version. -->
+            <!-- Licensing information: https://bootstrapmade.com/license/ -->
+            <!-- Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/nice-admin-bootstrap-admin-html-template/ -->
+            Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+        </div>
+    </footer><!-- End Footer -->
 
-            <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-            <!-- Vendor JS Files -->
-            <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
-            <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-            <script src="../assets/vendor/chart.js/chart.umd.js"></script>
-            <script src="../assets/vendor/echarts/echarts.min.js"></script>
-            <script src="../assets/vendor/quill/quill.min.js"></script>
-            <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
-            <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
-            <script src="../assets/vendor/php-email-form/validate.js"></script>
+    <!-- Vendor JS Files -->
+    <script src="../assets/vendor/apexcharts/apexcharts.min.js"></script>
+    <script src="../assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/vendor/chart.js/chart.umd.js"></script>
+    <script src="../assets/vendor/echarts/echarts.min.js"></script>
+    <script src="../assets/vendor/quill/quill.min.js"></script>
+    <script src="../assets/vendor/simple-datatables/simple-datatables.js"></script>
+    <script src="../assets/vendor/tinymce/tinymce.min.js"></script>
+    <script src="../assets/vendor/php-email-form/validate.js"></script>
 
-            <!-- Template Main JS File -->
-            <script src="../assets/js/main.js"></script>
+    <!-- Template Main JS File -->
+    <script src="../assets/js/main.js"></script>
 
 </body>
 

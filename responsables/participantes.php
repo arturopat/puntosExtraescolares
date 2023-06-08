@@ -188,6 +188,13 @@ if (!isset($_SESSION['nombre_usuario'])) {
                 </a>
             </li>
 
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="evidencias.php">
+                    <i class="bi bi-person"></i>
+                    <span>Evidencia</span>
+                </a>
+            </li>
+
 
 
 
